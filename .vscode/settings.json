@@ -1,0 +1,17 @@
+{
+  // editor
+  "editor.rulers": [80],
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit"
+  },
+
+  // formatting
+  "editor.defaultFormatter": "biomejs.biome",
+
+  // typescript
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "[markdown]": {
+    "editor.defaultFormatter": "yzhang.markdown-all-in-one"
+  },
+}
