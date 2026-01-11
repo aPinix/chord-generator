@@ -32,6 +32,29 @@ export function GuitarFretboard({
   onFingerChange,
   visibleFrets = TOTAL_FRETS,
 }: GuitarFretboardProps) {
+  // Calculate toggle all state - only for strings without finger positions
+  const unfrettedStrings = strings.filter(
+    (s) => s.fret === 0 || s.fret === 'X'
+  );
+  const allUnfrettedOpen =
+    unfrettedStrings.length > 0 && unfrettedStrings.every((s) => s.fret === 0);
+  const allUnfrettedMuted =
+    unfrettedStrings.length > 0 &&
+    unfrettedStrings.every((s) => s.fret === 'X');
+  const isIndeterminate =
+    unfrettedStrings.length > 0 && !allUnfrettedOpen && !allUnfrettedMuted;
+
+  const handleToggleAll = useCallback(() => {
+    // Only affect strings that are open (0) or muted (X), not fretted strings
+    const newValue = allUnfrettedMuted ? 0 : 'X';
+    for (let i = 0; i < TOTAL_STRINGS; i++) {
+      const current = strings[i].fret;
+      // Only toggle open or muted strings
+      if (current === 0 || current === 'X') {
+        onStringChange(i, newValue);
+      }
+    }
+  }, [allUnfrettedMuted, strings, onStringChange]);
   const handleFretClick = useCallback(
     (stringIndex: number, fret: number, decrease: boolean = false) => {
       const currentState = strings[stringIndex];
@@ -89,8 +112,33 @@ export function GuitarFretboard({
       <div className="relative flex overflow-hidden rounded-lg">
         {/* String labels - sticky on scroll */}
         <div className="sticky left-0 z-20 flex flex-col rounded-l-lg bg-white dark:bg-stone-900">
-          {/* Spacer to align with fret numbers row */}
-          <div className="h-7 rounded-tl-lg border-background border-r-4 bg-background" />
+          {/* Toggle all button + spacer to align with fret numbers row */}
+          <div className="mr-auto flex h-7 w-11 items-center justify-center rounded-tl-lg border-background border-r-4 bg-background">
+            <button
+              className={cn(
+                'flex size-4 cursor-pointer touch-manipulation items-center justify-center rounded-full font-bold text-[10px] transition-all',
+                allUnfrettedMuted &&
+                  'bg-red-500/30 text-red-700 dark:bg-red-500/20 dark:text-red-400',
+                allUnfrettedOpen &&
+                  'bg-green-500/30 text-green-700 dark:bg-green-500/20 dark:text-green-400',
+                isIndeterminate &&
+                  'bg-stone-300 text-stone-600 dark:bg-stone-600 dark:text-stone-300',
+                unfrettedStrings.length === 0 && 'cursor-not-allowed opacity-30'
+              )}
+              disabled={unfrettedStrings.length === 0}
+              onClick={handleToggleAll}
+              title={
+                unfrettedStrings.length === 0
+                  ? 'All strings have fingers'
+                  : allUnfrettedMuted
+                    ? 'Open unfretted strings'
+                    : 'Mute unfretted strings'
+              }
+              type="button"
+            >
+              {allUnfrettedMuted ? 'O' : allUnfrettedOpen ? 'X' : '-'}
+            </button>
+          </div>
           {/* String labels with nut border */}
           <div className="flex flex-col border-stone-800 border-r-4 dark:border-stone-300">
             {Array.from({ length: TOTAL_STRINGS }).map((_, stringIndex) => {

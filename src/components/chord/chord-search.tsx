@@ -115,26 +115,30 @@ export function ChordSearch({ onChordSelect }: ChordSearchProps) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex gap-2">
-        <Input
-          className="flex-1 bg-white dark:bg-zinc-900"
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search chords (e.g., Am, G, Fmaj7)"
-          value={searchQuery}
-        />
-        {loading && (
-          <div className="flex items-center px-2">
-            <Search className="size-4 animate-pulse text-muted-foreground" />
-          </div>
-        )}
+      <div className="flex overflow-hidden rounded-full bg-muted">
+        <div className="flex flex-1 items-center gap-2 pl-4">
+          <Search
+            className={`size-4 ${loading ? 'animate-pulse' : ''} text-muted-foreground`}
+          />
+          <Input
+            className="h-auto flex-1 border-0 bg-transparent py-3 shadow-none focus-visible:ring-0"
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search chords (e.g., Am, G, Fmaj7)"
+            value={searchQuery}
+          />
+        </div>
         <Dialog onOpenChange={setDialogOpen} open={dialogOpen}>
           <DialogTrigger
             render={
-              <Button size="sm" title="Browse all chords" variant="outline" />
+              <Button
+                className="h-auto rounded-none rounded-r-full px-5 py-3"
+                title="Browse all chords"
+                variant="outline"
+              />
             }
           >
             <Grid3X3 className="size-4" />
-            <span className="text-xs">Browse</span>
+            <span className="text-sm">Browse</span>
           </DialogTrigger>
           <DialogContent className="max-h-[calc(100dvh-4rem)]! w-screen! max-w-[calc(100vw-4rem)]! gap-0 overflow-hidden p-0">
             <DialogHeader className="border-border border-b px-6 py-6">

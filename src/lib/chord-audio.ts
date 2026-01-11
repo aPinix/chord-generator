@@ -37,12 +37,27 @@ const SOUNDFONT_BASE = 'https://gleitz.github.io/midi-js-soundfonts/FluidR3_GM';
 
 // Current guitar type (default: nylon acoustic)
 let currentGuitarType: GuitarType = 'acoustic_guitar_nylon';
+let guitarTypeInitialized = false;
+
+// Initialize guitar type from localStorage (client-side only)
+function initGuitarType(): void {
+  if (guitarTypeInitialized) return;
+  guitarTypeInitialized = true;
+  if (typeof window !== 'undefined') {
+    const saved = localStorage.getItem('chord-diagram-guitar');
+    if (saved && saved in GUITAR_TYPES) {
+      currentGuitarType = saved as GuitarType;
+    }
+  }
+}
 
 export function getGuitarType(): GuitarType {
+  initGuitarType();
   return currentGuitarType;
 }
 
 export function setGuitarType(type: GuitarType): void {
+  initGuitarType();
   if (type !== currentGuitarType) {
     currentGuitarType = type;
     // Clear cache when guitar type changes to load new samples

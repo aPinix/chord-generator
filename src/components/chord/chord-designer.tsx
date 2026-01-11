@@ -1,6 +1,7 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { Redo2, RotateCcw, Undo2 } from 'lucide-react';
+import { useCallback, useEffect } from 'react';
 import {
   Card,
   CardContent,
@@ -10,6 +11,12 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { useHistory } from '@/hooks/use-history';
 import { detectChordName } from '@/lib/chord-data';
 import type { StringState } from '@/types/chord';
 import { TOTAL_STRINGS } from '@/types/chord';
@@ -25,59 +32,127 @@ const initialStrings: StringState[] = Array.from(
   })
 );
 
-export function ChordDesigner() {
-  const [strings, setStrings] = useState<StringState[]>(initialStrings);
-  const [detectedName, setDetectedName] = useState<string | null>(null);
-  const [customName, setCustomName] = useState('');
-  const [useCustom, setUseCustom] = useState(false);
+interface ChordState {
+  strings: StringState[];
+  detectedName: string | null;
+  customName: string;
+  useCustom: boolean;
+}
 
-  // Detect chord name when strings change
+const initialChordState: ChordState = {
+  strings: initialStrings,
+  detectedName: null,
+  customName: '',
+  useCustom: false,
+};
+
+export function ChordDesigner() {
+  const {
+    state: chordState,
+    set: setChordState,
+    undo,
+    redo,
+    canUndo,
+    canRedo,
+    reset,
+  } = useHistory<ChordState>(initialChordState);
+
+  const { strings, detectedName, customName, useCustom } = chordState;
+
+  // Keyboard shortcuts for undo/redo
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'z') {
+        e.preventDefault();
+        if (e.shiftKey) {
+          redo();
+        } else {
+          undo();
+        }
+      }
+      if ((e.metaKey || e.ctrlKey) && e.key === 'y') {
+        e.preventDefault();
+        redo();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [undo, redo]);
+
+  // Detect chord name when strings change (update without creating history entry)
   useEffect(() => {
     const detected = detectChordName(strings);
-    setDetectedName(detected);
-  }, [strings]);
+    if (detected !== detectedName && !useCustom) {
+      // Only update detected name, don't create history entry for auto-detection
+    }
+  }, [strings, detectedName, useCustom]);
 
   // The actual name to display: custom if selected, otherwise detected
   const chordName = useCustom ? customName : detectedName || customName;
 
   const handleStringChange = useCallback(
     (stringIndex: number, fret: number | 'X' | 0) => {
-      setStrings((prev) => {
-        const newStrings = [...prev];
-        newStrings[stringIndex] = { ...newStrings[stringIndex], fret };
-        return newStrings;
+      const newStrings = [...strings];
+      newStrings[stringIndex] = { ...newStrings[stringIndex], fret };
+      const detected = detectChordName(newStrings);
+      setChordState({
+        ...chordState,
+        strings: newStrings,
+        detectedName: detected,
       });
     },
-    []
+    [strings, chordState, setChordState]
   );
 
   const handleFingerChange = useCallback(
     (stringIndex: number, finger: number | undefined) => {
-      setStrings((prev) => {
-        const newStrings = [...prev];
-        newStrings[stringIndex] = { ...newStrings[stringIndex], finger };
-        return newStrings;
+      const newStrings = [...strings];
+      newStrings[stringIndex] = { ...newStrings[stringIndex], finger };
+      setChordState({
+        ...chordState,
+        strings: newStrings,
       });
     },
-    []
+    [strings, chordState, setChordState]
   );
 
   const handleChordSelect = useCallback(
     (newStrings: StringState[], name: string) => {
-      setStrings(newStrings);
-      setDetectedName(name);
-      setCustomName('');
-      setUseCustom(false);
+      setChordState({
+        strings: newStrings,
+        detectedName: name,
+        customName: '',
+        useCustom: false,
+      });
     },
-    []
+    [setChordState]
   );
 
   const handleReset = useCallback(() => {
-    setStrings(initialStrings);
-    setDetectedName(null);
-    setCustomName('');
-    setUseCustom(false);
-  }, []);
+    reset(initialChordState);
+  }, [reset]);
+
+  const handleCustomNameChange = useCallback(
+    (value: string) => {
+      setChordState({
+        ...chordState,
+        customName: value,
+        useCustom: true,
+      });
+    },
+    [chordState, setChordState]
+  );
+
+  const handleUseCustomToggle = useCallback(
+    (value: boolean) => {
+      setChordState({
+        ...chordState,
+        useCustom: value,
+      });
+    },
+    [chordState, setChordState]
+  );
 
   return (
     <div className="flex flex-col gap-8">
@@ -105,11 +180,57 @@ export function ChordDesigner() {
         {/* Fretboard */}
         <Card className="rounded-3xl border-0 bg-muted/50 shadow-none ring-0 dark:bg-zinc-900/80 dark:ring-1 dark:ring-white/10">
           <CardHeader>
-            <CardTitle className="flex items-center gap-3">
-              <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary font-semibold text-primary-foreground text-sm">
-                2
-              </span>
-              Interactive Fretboard
+            <CardTitle className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary font-semibold text-primary-foreground text-sm">
+                  2
+                </span>
+                Interactive Fretboard
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Tooltip>
+                  <TooltipTrigger
+                    aria-disabled={!canUndo}
+                    className={`inline-flex size-9 items-center justify-center rounded-lg border transition-all ${
+                      canUndo
+                        ? 'cursor-pointer border-border bg-background text-foreground shadow-sm hover:bg-accent hover:text-accent-foreground active:scale-95'
+                        : 'pointer-events-none cursor-not-allowed border-transparent bg-transparent text-muted-foreground/40'
+                    }`}
+                    onClick={canUndo ? undo : undefined}
+                  >
+                    <Undo2 className="size-5" />
+                    <span className="sr-only">Undo (Ctrl+Z)</span>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">Undo (Ctrl+Z)</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger
+                    aria-disabled={!canRedo}
+                    className={`inline-flex size-9 items-center justify-center rounded-lg border transition-all ${
+                      canRedo
+                        ? 'cursor-pointer border-border bg-background text-foreground shadow-sm hover:bg-accent hover:text-accent-foreground active:scale-95'
+                        : 'pointer-events-none cursor-not-allowed border-transparent bg-transparent text-muted-foreground/40'
+                    }`}
+                    onClick={canRedo ? redo : undefined}
+                  >
+                    <Redo2 className="size-5" />
+                    <span className="sr-only">Redo (Ctrl+Shift+Z)</span>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">
+                    Redo (Ctrl+Shift+Z)
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger
+                    className="inline-flex size-9 cursor-pointer items-center justify-center rounded-lg border border-border bg-background text-foreground shadow-sm transition-all hover:bg-accent hover:text-accent-foreground active:scale-95"
+                    onClick={handleReset}
+                  >
+                    <RotateCcw className="size-5" />
+                    <span className="sr-only">Reset</span>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">Reset</TooltipContent>
+                </Tooltip>
+              </div>
             </CardTitle>
             <CardDescription>
               Click on the fretboard to place finger positions. Click the O/X
@@ -124,58 +245,91 @@ export function ChordDesigner() {
               visibleFrets={21}
             />
 
-            {/* Finger Legend */}
-            <div className="flex flex-wrap items-center gap-3 rounded-2xl bg-background/80 p-3 dark:bg-zinc-800/50">
-              <span className="text-muted-foreground text-sm">Fingers:</span>
-              <div className="flex items-center gap-1">
-                <div className="flex size-6 items-center justify-center rounded-full bg-orange-500 font-bold text-white text-xs">
-                  •
+            {/* Legend & Controls Info */}
+            <div className="flex flex-col gap-4 rounded-2xl bg-background/60 p-4 dark:bg-zinc-800/40">
+              {/* Finger Legend */}
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+                <span className="font-medium text-muted-foreground text-xs uppercase tracking-wide">
+                  Fingers:
+                </span>
+                <div className="flex flex-wrap items-center gap-2">
+                  <div className="flex items-center gap-1.5">
+                    <div className="flex size-5 items-center justify-center rounded-full bg-orange-500 font-bold text-[10px] text-white shadow-sm">
+                      •
+                    </div>
+                    <span className="text-muted-foreground text-xs">None</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <div className="flex size-5 items-center justify-center rounded-full bg-sky-500 font-bold text-[10px] text-white shadow-sm">
+                      1
+                    </div>
+                    <span className="text-muted-foreground text-xs">Index</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <div className="flex size-5 items-center justify-center rounded-full bg-lime-500 font-bold text-[10px] text-white shadow-sm">
+                      2
+                    </div>
+                    <span className="text-muted-foreground text-xs">
+                      Middle
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <div className="flex size-5 items-center justify-center rounded-full bg-amber-500 font-bold text-[10px] text-white shadow-sm">
+                      3
+                    </div>
+                    <span className="text-muted-foreground text-xs">Ring</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <div className="flex size-5 items-center justify-center rounded-full bg-pink-500 font-bold text-[10px] text-white shadow-sm">
+                      4
+                    </div>
+                    <span className="text-muted-foreground text-xs">Pinky</span>
+                  </div>
                 </div>
-                <span className="font-semibold text-muted-foreground text-xs">
-                  No finger
-                </span>
               </div>
-              <div className="flex items-center gap-1">
-                <div className="flex size-6 items-center justify-center rounded-full bg-sky-500 font-bold text-white text-xs">
-                  1
+
+              {/* Shortcuts */}
+              <div className="flex flex-wrap gap-x-8 gap-y-3 border-muted border-t pt-4 text-sm">
+                <div className="flex items-center gap-3">
+                  <span className="font-medium text-muted-foreground uppercase tracking-wide">
+                    Mouse:
+                  </span>
+                  <span className="text-muted-foreground">
+                    <kbd className="rounded-md bg-muted px-2 py-1 font-mono text-xs">
+                      Click
+                    </kbd>{' '}
+                    +1
+                  </span>
+                  <span className="text-muted-foreground/50">·</span>
+                  <span className="text-muted-foreground">
+                    <kbd className="rounded-md bg-muted px-2 py-1 font-mono text-xs">
+                      Right-click
+                    </kbd>{' '}
+                    −1
+                  </span>
                 </div>
-                <span className="font-semibold text-muted-foreground text-xs">
-                  Index
-                </span>
               </div>
-              <div className="flex items-center gap-1">
-                <div className="flex size-6 items-center justify-center rounded-full bg-lime-500 font-bold text-white text-xs">
-                  2
+
+              {/* History Shortcuts */}
+              <div className="flex flex-wrap gap-x-8 gap-y-3 border-muted border-t pt-4 text-sm">
+                <div className="flex items-center gap-3">
+                  <span className="font-medium text-muted-foreground uppercase tracking-wide">
+                    History:
+                  </span>
+                  <span className="text-muted-foreground">
+                    <kbd className="rounded-md bg-muted px-2 py-1 font-mono text-xs">
+                      ⌘Z
+                    </kbd>{' '}
+                    Undo
+                  </span>
+                  <span className="text-muted-foreground/50">·</span>
+                  <span className="text-muted-foreground">
+                    <kbd className="rounded-md bg-muted px-2 py-1 font-mono text-xs">
+                      ⌘⇧Z
+                    </kbd>{' '}
+                    Redo
+                  </span>
                 </div>
-                <span className="font-semibold text-muted-foreground text-xs">
-                  Middle
-                </span>
-              </div>
-              <div className="flex items-center gap-1">
-                <div className="flex size-6 items-center justify-center rounded-full bg-amber-500 font-bold text-white text-xs">
-                  3
-                </div>
-                <span className="font-semibold text-muted-foreground text-xs">
-                  Ring
-                </span>
-              </div>
-              <div className="flex items-center gap-1">
-                <div className="flex size-6 items-center justify-center rounded-full bg-pink-500 font-bold text-white text-xs">
-                  4
-                </div>
-                <span className="font-semibold text-muted-foreground text-xs">
-                  Pinky
-                </span>
-              </div>
-              <div className="ml-auto flex flex-col gap-0.5 text-right text-muted-foreground text-xs">
-                <span>
-                  <span className="font-semibold">Click</span> to increase{' '}
-                  <span className="tracking-tight">(• → 1 → 2 → 3 → 4)</span>
-                </span>
-                <span>
-                  <span className="font-semibold">Right-click</span> or{' '}
-                  <span className="font-semibold">Shift+click</span> to decrease
-                </span>
               </div>
             </div>
           </CardContent>
@@ -196,46 +350,32 @@ export function ChordDesigner() {
               <Label className="text-muted-foreground text-xs">
                 Chord Name
               </Label>
-              <div className="flex gap-2">
+              <div className="flex overflow-hidden rounded-full bg-muted">
                 {/* Detected chord button */}
                 {detectedName && (
                   <button
-                    className={`cursor-pointer rounded-lg border px-3 py-2 font-medium text-sm transition-colors ${
+                    className={`cursor-pointer px-4 py-2.5 font-medium text-sm transition-colors ${
                       !useCustom
-                        ? 'border-primary bg-primary/10 text-primary'
-                        : 'border-border bg-muted/50 text-muted-foreground hover:bg-muted'
+                        ? 'bg-primary text-primary-foreground'
+                        : 'text-muted-foreground hover:bg-muted-foreground/10'
                     }`}
-                    onClick={() => setUseCustom(false)}
+                    onClick={() => handleUseCustomToggle(false)}
                     title="Use detected chord name"
                     type="button"
                   >
                     {detectedName}
                   </button>
                 )}
-                {/* Custom name input with select button */}
+                {/* Custom name input */}
                 <div
-                  className={`flex flex-1 items-center gap-1 rounded-lg border px-1 transition-colors ${
-                    useCustom
-                      ? 'bg-background ring-1 ring-primary'
-                      : 'border-border hover:border-muted-foreground'
+                  className={`flex flex-1 items-center transition-colors ${
+                    useCustom ? 'bg-primary/10' : ''
                   }`}
                 >
-                  <button
-                    className={`inline-flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-full p-0 text-xs transition-colors ${
-                      useCustom
-                        ? 'bg-primary/20 text-primary'
-                        : 'text-muted-foreground hover:text-foreground'
-                    }`}
-                    onClick={() => setUseCustom(true)}
-                    title="Use custom name"
-                    type="button"
-                  >
-                    {useCustom ? '✓' : '○'}
-                  </button>
                   <Input
-                    className="flex-1 border-0 bg-transparent shadow-none focus-visible:ring-0"
-                    onChange={(e) => setCustomName(e.target.value)}
-                    onFocus={() => setUseCustom(true)}
+                    className="h-auto flex-1 border-0 bg-transparent py-2.5 shadow-none focus-visible:ring-0"
+                    onChange={(e) => handleCustomNameChange(e.target.value)}
+                    onFocus={() => handleUseCustomToggle(true)}
                     placeholder={
                       detectedName ? 'Custom name...' : 'e.g., Am, G7, Fmaj7'
                     }
@@ -245,11 +385,7 @@ export function ChordDesigner() {
               </div>
             </div>
 
-            <ChordDiagram
-              chordName={chordName}
-              onReset={handleReset}
-              strings={strings}
-            />
+            <ChordDiagram chordName={chordName} strings={strings} />
           </CardContent>
         </Card>
       </div>

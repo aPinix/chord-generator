@@ -1,6 +1,6 @@
 'use client';
 
-import { Download, RotateCcw, Volume2 } from 'lucide-react';
+import { Download, Volume2 } from 'lucide-react';
 import {
   forwardRef,
   useCallback,
@@ -11,8 +11,16 @@ import {
 } from 'react';
 import { Button } from '@/components/ui/button';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
   GUITAR_TYPES,
   type GuitarType,
+  getGuitarType,
   playChord,
   setGuitarType,
 } from '@/lib/chord-audio';
@@ -25,7 +33,6 @@ interface ChordDiagramProps {
   chordName?: string;
   size?: DiagramSize;
   showControls?: boolean;
-  onReset?: () => void;
   /** When true, renders SVG directly without PNG conversion for faster display */
   static?: boolean;
 }
@@ -55,7 +62,6 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
       chordName = '',
       size,
       showControls = true,
-      onReset,
       static: isStatic = false,
     },
     ref
@@ -64,9 +70,8 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
     const svgRef = (ref as React.RefObject<SVGSVGElement>) || internalRef;
     const [downloadFormat, setDownloadFormat] = useState<DownloadFormat>('png');
     const [diagramSize, setDiagramSize] = useState<DiagramSize>(size || 'md');
-    const [guitarType, setGuitarTypeState] = useState<GuitarType>(
-      'acoustic_guitar_nylon'
-    );
+    const [guitarType, setGuitarTypeState] =
+      useState<GuitarType>(getGuitarType);
 
     // User's preferred drag size (from localStorage) - used for dragged images in static mode
     const [userPreferredSize, setUserPreferredSize] =
@@ -446,10 +451,9 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
               <text
                 fill={FILL_COLOR}
                 fontFamily="system-ui, sans-serif"
-                fontSize={12}
-                fontWeight="bold"
+                fontSize={10}
                 textAnchor="end"
-                x={startX - 8}
+                x={startX - 2}
                 y={startY + fretSpacing / 2 + 4}
               >
                 {startFret}
@@ -624,112 +628,112 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
         {showControls && (
           <div className="mt-4 w-full space-y-3">
             {/* Primary action: Download */}
-            <div className="flex w-full gap-2">
-              {onReset && (
-                <Button
-                  onClick={onReset}
-                  size="icon"
-                  title="Reset"
-                  variant="ghost"
-                >
-                  <RotateCcw className="h-4 w-4" />
-                </Button>
-              )}
-              <Button className="flex-1" onClick={downloadImage} size="sm">
-                <Download className="mr-2 h-4 w-4" />
-                Download
-              </Button>
-            </div>
+            <Button
+              className="h-10 w-full rounded-full"
+              onClick={downloadImage}
+            >
+              <Download className="mr-2 h-4 w-4" />
+              Download
+            </Button>
 
-            {/* Secondary options: Size, Format & Play (muted/compact) */}
-            <div className="flex flex-col gap-1.5 rounded-lg bg-muted/50 p-2">
-              <div className="flex items-center gap-2 text-muted-foreground text-xs">
-                <span className="w-10 shrink-0">Size</span>
-                <div className="flex flex-1 gap-0.5">
-                  {(['xs', 'sm', 'md', 'lg', 'xl'] as DiagramSize[]).map(
-                    (s) => (
+            {/* Options Section */}
+            <div className="flex flex-col gap-3 rounded-2xl bg-background/60 p-3 dark:bg-zinc-800/40">
+              <span className="font-medium text-muted-foreground text-xs uppercase tracking-wide">
+                Options
+              </span>
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-2 text-muted-foreground text-xs">
+                  <span className="w-12 shrink-0">Size</span>
+                  <div className="flex flex-1 overflow-hidden rounded-full bg-muted">
+                    {(['xs', 'sm', 'md', 'lg', 'xl'] as DiagramSize[]).map(
+                      (s) => (
+                        <button
+                          className={`flex-1 cursor-pointer px-2 py-1.5 text-xs transition-colors ${
+                            effectiveSize === s
+                              ? 'bg-primary text-primary-foreground'
+                              : 'hover:bg-muted-foreground/10'
+                          }`}
+                          key={s}
+                          onClick={() => setDiagramSize(s)}
+                          type="button"
+                        >
+                          {s.toUpperCase()}
+                        </button>
+                      )
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 text-muted-foreground text-xs">
+                  <span className="w-12 shrink-0">Format</span>
+                  <div className="flex flex-1 overflow-hidden rounded-full bg-muted">
+                    {(['png', 'jpg', 'svg'] as DownloadFormat[]).map((f) => (
                       <button
-                        className={`flex-1 cursor-pointer rounded px-1 py-0.5 text-xs transition-colors ${
-                          effectiveSize === s
-                            ? 'bg-background text-foreground shadow-sm'
-                            : 'hover:bg-background/50'
+                        className={`flex-1 cursor-pointer px-2 py-1.5 text-xs transition-colors ${
+                          downloadFormat === f
+                            ? 'bg-primary text-primary-foreground'
+                            : 'hover:bg-muted-foreground/10'
                         }`}
-                        key={s}
-                        onClick={() => setDiagramSize(s)}
+                        key={f}
+                        onClick={() => setDownloadFormat(f)}
                         type="button"
                       >
-                        {s.toUpperCase()}
+                        {f.toUpperCase()}
                       </button>
-                    )
-                  )}
+                    ))}
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-center gap-2 text-muted-foreground text-xs">
-                <span className="w-10 shrink-0">Format</span>
-                <div className="flex flex-1 gap-0.5">
-                  {(['png', 'jpg', 'svg'] as DownloadFormat[]).map((f) => (
+                <div className="flex items-center gap-2 text-muted-foreground text-xs">
+                  <span className="w-12 shrink-0">Guitar</span>
+                  <Select
+                    onValueChange={(value) =>
+                      setGuitarTypeState(value as GuitarType)
+                    }
+                    value={guitarType}
+                  >
+                    <SelectTrigger className="h-auto flex-1 rounded-full border-0 bg-muted px-3 py-1.5 text-xs shadow-none hover:bg-muted-foreground/10">
+                      <SelectValue>{GUITAR_TYPES[guitarType]}</SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {(
+                        Object.entries(GUITAR_TYPES) as [GuitarType, string][]
+                      ).map(([key, label]) => (
+                        <SelectItem key={key} value={key}>
+                          {label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex items-center gap-2 text-muted-foreground text-xs">
+                  <span className="w-12 shrink-0">Play</span>
+                  <div className="flex flex-1 overflow-hidden rounded-full bg-muted">
                     <button
-                      className={`flex-1 cursor-pointer rounded px-1 py-0.5 text-xs transition-colors ${
-                        downloadFormat === f
-                          ? 'bg-background text-foreground shadow-sm'
-                          : 'hover:bg-background/50'
-                      }`}
-                      key={f}
-                      onClick={() => setDownloadFormat(f)}
+                      className="flex flex-1 cursor-pointer items-center justify-center gap-1 px-2 py-1.5 text-xs transition-colors hover:bg-muted-foreground/10"
+                      onClick={() => {
+                        const audioStrings = [...strings]
+                          .reverse()
+                          .map((s) => s.fret);
+                        playChord(audioStrings, { strumSpeed: 50 });
+                      }}
                       type="button"
                     >
-                      {f.toUpperCase()}
+                      <Volume2 className="h-3 w-3" />
+                      Normal
                     </button>
-                  ))}
-                </div>
-              </div>
-              <div className="flex items-center gap-2 text-muted-foreground text-xs">
-                <span className="w-10 shrink-0">Guitar</span>
-                <select
-                  className="flex-1 cursor-pointer rounded bg-background/50 px-1 py-0.5 text-xs transition-colors hover:bg-background"
-                  onChange={(e) =>
-                    setGuitarTypeState(e.target.value as GuitarType)
-                  }
-                  value={guitarType}
-                >
-                  {(Object.entries(GUITAR_TYPES) as [GuitarType, string][]).map(
-                    ([key, label]) => (
-                      <option key={key} value={key}>
-                        {label}
-                      </option>
-                    )
-                  )}
-                </select>
-              </div>
-              <div className="flex items-center gap-2 text-muted-foreground text-xs">
-                <span className="w-10 shrink-0">Play</span>
-                <div className="flex flex-1 gap-1">
-                  <button
-                    className="flex flex-1 cursor-pointer items-center justify-center gap-1 rounded bg-background/50 px-1 py-0.5 text-xs transition-colors hover:bg-background"
-                    onClick={() => {
-                      const audioStrings = [...strings]
-                        .reverse()
-                        .map((s) => s.fret);
-                      playChord(audioStrings, { strumSpeed: 50 });
-                    }}
-                    type="button"
-                  >
-                    <Volume2 className="h-3 w-3" />
-                    Normal
-                  </button>
-                  <button
-                    className="flex flex-1 cursor-pointer items-center justify-center gap-1 rounded bg-background/50 px-1 py-0.5 text-xs transition-colors hover:bg-background"
-                    onClick={() => {
-                      const audioStrings = [...strings]
-                        .reverse()
-                        .map((s) => s.fret);
-                      playChord(audioStrings, { strumSpeed: 200 });
-                    }}
-                    type="button"
-                  >
-                    <Volume2 className="h-3 w-3" />
-                    Slow
-                  </button>
+                    <button
+                      className="flex flex-1 cursor-pointer items-center justify-center gap-1 px-2 py-1.5 text-xs transition-colors hover:bg-muted-foreground/10"
+                      onClick={() => {
+                        const audioStrings = [...strings]
+                          .reverse()
+                          .map((s) => s.fret);
+                        playChord(audioStrings, { strumSpeed: 200 });
+                      }}
+                      type="button"
+                    >
+                      <Volume2 className="h-3 w-3" />
+                      Slow
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
