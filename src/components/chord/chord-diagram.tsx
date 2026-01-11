@@ -60,15 +60,20 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
     const [downloadFormat, setDownloadFormat] = useState<DownloadFormat>('png');
     const [diagramSize, setDiagramSize] = useState<DiagramSize>(size || 'md');
 
+    // User's preferred drag size (from localStorage) - used for dragged images in static mode
+    const [userPreferredSize, setUserPreferredSize] =
+      useState<DiagramSize>('md');
+
     // Sync preferences from localStorage after hydration to avoid SSR mismatch
     useEffect(() => {
       const savedFormat = localStorage.getItem('chord-diagram-format');
       if (savedFormat && ['png', 'jpg', 'svg'].includes(savedFormat)) {
         setDownloadFormat(savedFormat as DownloadFormat);
       }
-      if (!size) {
-        const savedSize = localStorage.getItem('chord-diagram-size');
-        if (savedSize && ['xs', 'sm', 'md', 'lg', 'xl'].includes(savedSize)) {
+      const savedSize = localStorage.getItem('chord-diagram-size');
+      if (savedSize && ['xs', 'sm', 'md', 'lg', 'xl'].includes(savedSize)) {
+        setUserPreferredSize(savedSize as DiagramSize);
+        if (!size) {
           setDiagramSize(savedSize as DiagramSize);
         }
       }
@@ -89,15 +94,18 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
 
     // Use prop size if provided (for fixed size previews), otherwise use internal state
     const effectiveSize = size || diagramSize;
-    const scale = SIZE_SCALES[effectiveSize];
+
+    // For static mode, use user's preferred size for dragged images
+    const dragSize = isStatic ? userPreferredSize : effectiveSize;
+    const dragScale = SIZE_SCALES[dragSize];
 
     // SVG always renders at base size
     const svgWidth = BASE_WIDTH;
     const svgHeight = BASE_HEIGHT;
 
-    // Preview/export dimensions (for drag)
-    const outputWidth = Math.round(BASE_WIDTH * scale);
-    const outputHeight = Math.round(BASE_HEIGHT * scale);
+    // Preview/export dimensions (for drag) - use user's preferred size in static mode
+    const outputWidth = Math.round(BASE_WIDTH * dragScale);
+    const outputHeight = Math.round(BASE_HEIGHT * dragScale);
 
     // XL dimensions for high-quality display
     const xlScale = SIZE_SCALES.xl;
@@ -218,11 +226,9 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
       return serializer.serializeToString(svg);
     }, [svgRef]);
 
-    // Generate PNG previews from SVG - XL for display, selected size for drag
-    // Skip PNG generation in static mode for faster rendering
+    // Generate PNG previews from SVG - XL for display (non-static), selected size for drag (always)
     // biome-ignore lint/correctness/useExhaustiveDependencies: chordName and diagramData affect SVG content read via DOM serialization
     useEffect(() => {
-      if (isStatic) return;
       const svg = svgRef.current;
       if (!svg) return;
 
@@ -230,7 +236,7 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
       const svgString = serializer.serializeToString(svg);
       const dpr = window.devicePixelRatio || 1;
 
-      // Generate selected-size PNG for drag
+      // Generate selected-size PNG for drag (always needed for dragging)
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
@@ -239,15 +245,6 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
       canvas.height = outputHeight * dpr;
       ctx.scale(dpr, dpr);
 
-      // Generate XL PNG for display
-      const xlCanvas = document.createElement('canvas');
-      const xlCtx = xlCanvas.getContext('2d');
-      if (!xlCtx) return;
-
-      xlCanvas.width = xlWidth * dpr;
-      xlCanvas.height = xlHeight * dpr;
-      xlCtx.scale(dpr, dpr);
-
       const svgBlob = new Blob([svgString], {
         type: 'image/svg+xml;charset=utf-8',
       });
@@ -255,17 +252,26 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
 
       const img = new Image();
       img.onload = () => {
-        // Render selected size
+        // Render selected size for drag
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(0, 0, outputWidth, outputHeight);
         ctx.drawImage(img, 0, 0, outputWidth, outputHeight);
         setPngDataUrl(canvas.toDataURL('image/png'));
 
-        // Render XL size
-        xlCtx.fillStyle = '#ffffff';
-        xlCtx.fillRect(0, 0, xlWidth, xlHeight);
-        xlCtx.drawImage(img, 0, 0, xlWidth, xlHeight);
-        setXlPngDataUrl(xlCanvas.toDataURL('image/png'));
+        // Only generate XL PNG for display in non-static mode
+        if (!isStatic) {
+          const xlCanvas = document.createElement('canvas');
+          const xlCtx = xlCanvas.getContext('2d');
+          if (xlCtx) {
+            xlCanvas.width = xlWidth * dpr;
+            xlCanvas.height = xlHeight * dpr;
+            xlCtx.scale(dpr, dpr);
+            xlCtx.fillStyle = '#ffffff';
+            xlCtx.fillRect(0, 0, xlWidth, xlHeight);
+            xlCtx.drawImage(img, 0, 0, xlWidth, xlHeight);
+            setXlPngDataUrl(xlCanvas.toDataURL('image/png'));
+          }
+        }
 
         URL.revokeObjectURL(url);
       };
@@ -340,12 +346,14 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
     ]);
 
     return (
-      <div className="flex h-full w-full flex-col items-center">
+      <div
+        className={`flex h-full w-full flex-col items-center ${isStatic ? 'relative' : ''}`}
+      >
         {/* SVG - hidden when generating PNG, visible in static mode */}
         <svg
           aria-labelledby="chord-title"
           className={
-            isStatic ? 'w-full rounded-sm bg-white' : 'absolute -left-[9999px]'
+            isStatic ? 'w-full rounded-lg bg-white' : 'absolute -left-[9999px]'
           }
           height={svgHeight}
           ref={svgRef}
@@ -555,6 +563,18 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
             </text>
           )}
         </svg>
+
+        {/* Draggable PNG overlay for static mode */}
+        {isStatic && pngDataUrl && (
+          <AndImage
+            alt={chordName ? `${chordName} chord diagram` : 'Chord diagram'}
+            className="absolute inset-0 h-full w-full rounded-lg opacity-0"
+            draggable
+            height={outputHeight}
+            src={pngDataUrl}
+            width={outputWidth}
+          />
+        )}
 
         {/* PNG preview with high-quality display and draggable selected-size layer */}
         {!isStatic && xlPngDataUrl && (
