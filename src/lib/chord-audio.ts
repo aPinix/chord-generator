@@ -1,64 +1,132 @@
-// Guitar string frequencies (open strings, low E to high E)
-const OPEN_STRING_FREQUENCIES = [82.41, 110.0, 146.83, 196.0, 246.94, 329.63];
+// MIDI note names for each guitar string open (low E to high E)
+// E2=40, A2=45, D3=50, G3=55, B3=59, E4=64
+const OPEN_STRING_MIDI = [40, 45, 50, 55, 59, 64];
 
-// Available types: 'sine' (cleanest), 'triangle' (warm), 'square' (buzzy), 'sawtooth' (bright/harsh)
-const OSCILLATOR_TYPE: OscillatorType = 'triangle';
+// Note names for MIDI numbers
+const NOTE_NAMES = [
+  'C',
+  'Db',
+  'D',
+  'Eb',
+  'E',
+  'F',
+  'Gb',
+  'G',
+  'Ab',
+  'A',
+  'Bb',
+  'B',
+];
 
-// Calculate frequency for a given string and fret
-function getFrequency(stringIndex: number, fret: number): number {
-  const openFreq = OPEN_STRING_FREQUENCIES[stringIndex];
-  // Each fret is a semitone higher (multiply by 2^(1/12))
-  return openFreq * 2 ** (fret / 12);
+// Available guitar types
+export const GUITAR_TYPES = {
+  acoustic_guitar_nylon: 'Nylon Acoustic',
+  acoustic_guitar_steel: 'Steel Acoustic',
+  electric_guitar_jazz: 'Jazz Electric',
+  electric_guitar_clean: 'Clean Electric',
+  electric_guitar_muted: 'Muted Electric',
+  overdriven_guitar: 'Overdriven',
+  distortion_guitar: 'Distortion',
+  guitar_harmonics: 'Harmonics',
+} as const;
+
+export type GuitarType = keyof typeof GUITAR_TYPES;
+
+// Soundfont base URL
+const SOUNDFONT_BASE = 'https://gleitz.github.io/midi-js-soundfonts/FluidR3_GM';
+
+// Current guitar type (default: nylon acoustic)
+let currentGuitarType: GuitarType = 'acoustic_guitar_nylon';
+
+export function getGuitarType(): GuitarType {
+  return currentGuitarType;
 }
 
-// Create a clean guitar-like tone using Web Audio API
-function playTone(
-  audioContext: AudioContext,
-  frequency: number,
+export function setGuitarType(type: GuitarType): void {
+  if (type !== currentGuitarType) {
+    currentGuitarType = type;
+    // Clear cache when guitar type changes to load new samples
+    audioBufferCache.clear();
+    loadingPromises.clear();
+  }
+}
+
+function getSoundfontUrl(): string {
+  return `${SOUNDFONT_BASE}/${currentGuitarType}-mp3`;
+}
+
+// Cache for loaded audio buffers
+const audioBufferCache = new Map<string, AudioBuffer>();
+const loadingPromises = new Map<string, Promise<AudioBuffer | null>>();
+
+// Convert MIDI note number to note name (e.g., 40 -> "E2")
+function midiToNoteName(midi: number): string {
+  const octave = Math.floor(midi / 12) - 1;
+  const note = NOTE_NAMES[midi % 12];
+  return `${note}${octave}`;
+}
+
+// Get MIDI note for a string and fret
+function getMidiNote(stringIndex: number, fret: number): number {
+  return OPEN_STRING_MIDI[stringIndex] + fret;
+}
+
+// Load a single note sample
+async function loadNote(
+  noteName: string,
+  ctx: AudioContext
+): Promise<AudioBuffer | null> {
+  // Check cache first
+  const cached = audioBufferCache.get(noteName);
+  if (cached) return cached;
+
+  // Check if already loading
+  const loading = loadingPromises.get(noteName);
+  if (loading) return loading;
+
+  // Start loading
+  const loadPromise = (async () => {
+    try {
+      const response = await fetch(`${getSoundfontUrl()}/${noteName}.mp3`);
+      if (!response.ok) return null;
+      const arrayBuffer = await response.arrayBuffer();
+      const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
+      audioBufferCache.set(noteName, audioBuffer);
+      return audioBuffer;
+    } catch {
+      console.warn(`Failed to load note: ${noteName}`);
+      return null;
+    }
+  })();
+
+  loadingPromises.set(noteName, loadPromise);
+  return loadPromise;
+}
+
+// Play a single note from the soundfont
+async function playNote(
+  ctx: AudioContext,
+  midiNote: number,
   startTime: number,
-  duration: number = 1.5
-): void {
-  // Main oscillator
-  const oscillator = audioContext.createOscillator();
-  oscillator.type = OSCILLATOR_TYPE;
-  oscillator.frequency.setValueAtTime(frequency, startTime);
+  duration: number = 2
+): Promise<void> {
+  const noteName = midiToNoteName(midiNote);
+  const buffer = await loadNote(noteName, ctx);
 
-  // Subtle second harmonic for slight warmth
-  const oscillator2 = audioContext.createOscillator();
-  oscillator2.type = OSCILLATOR_TYPE;
-  oscillator2.frequency.setValueAtTime(frequency * 2, startTime);
+  if (!buffer) return;
 
-  // Main gain
-  const gainNode = audioContext.createGain();
-  // Second harmonic gain (very subtle)
-  const gainNode2 = audioContext.createGain();
+  const source = ctx.createBufferSource();
+  source.buffer = buffer;
 
-  // Low-pass filter for smoother sound
-  const filter = audioContext.createBiquadFilter();
-  filter.type = 'lowpass';
-  filter.frequency.setValueAtTime(2000, startTime);
-  filter.Q.setValueAtTime(1, startTime);
+  const gainNode = ctx.createGain();
+  gainNode.gain.setValueAtTime(0.7, startTime);
+  gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
 
-  // Envelope: soft attack, smooth decay
-  gainNode.gain.setValueAtTime(0, startTime);
-  gainNode.gain.linearRampToValueAtTime(0.15, startTime + 0.02);
-  gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+  source.connect(gainNode);
+  gainNode.connect(ctx.destination);
 
-  gainNode2.gain.setValueAtTime(0, startTime);
-  gainNode2.gain.linearRampToValueAtTime(0.03, startTime + 0.02);
-  gainNode2.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
-
-  // Connect: oscillators -> gains -> filter -> output
-  oscillator.connect(gainNode);
-  oscillator2.connect(gainNode2);
-  gainNode.connect(filter);
-  gainNode2.connect(filter);
-  filter.connect(audioContext.destination);
-
-  oscillator.start(startTime);
-  oscillator.stop(startTime + duration);
-  oscillator2.start(startTime);
-  oscillator2.stop(startTime + duration);
+  source.start(startTime);
+  source.stop(startTime + duration);
 }
 
 export type StringFret = number | 'X' | 0;
@@ -77,6 +145,22 @@ function getAudioContext(): AudioContext {
   return audioContext;
 }
 
+// Preload common guitar notes for faster playback
+export async function preloadGuitarSounds(): Promise<void> {
+  const ctx = getAudioContext();
+  // Preload notes from fret 0-12 for all strings
+  const notesToLoad: string[] = [];
+  for (let string = 0; string < 6; string++) {
+    for (let fret = 0; fret <= 12; fret++) {
+      const midi = getMidiNote(string, fret);
+      notesToLoad.push(midiToNoteName(midi));
+    }
+  }
+  // Remove duplicates
+  const uniqueNotes = [...new Set(notesToLoad)];
+  await Promise.all(uniqueNotes.map((note) => loadNote(note, ctx)));
+}
+
 // Play a chord given string/fret positions (low E to high E order)
 export function playChord(
   strings: StringFret[],
@@ -93,14 +177,13 @@ export function playChord(
   const now = ctx.currentTime;
 
   // Play each string from low E (index 0) to high E (index 5)
-  // strings array should be in low E to high E order
   strings.forEach((fret, stringIndex) => {
     // Skip muted strings (X)
     if (fret === 'X') return;
 
-    const frequency = getFrequency(stringIndex, fret as number);
+    const midiNote = getMidiNote(stringIndex, fret as number);
     const startTime = now + (stringIndex * strumSpeed) / 1000;
-    playTone(ctx, frequency, startTime, duration);
+    playNote(ctx, midiNote, startTime, duration);
   });
 }
 

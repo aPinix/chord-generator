@@ -10,7 +10,12 @@ import {
   useState,
 } from 'react';
 import { Button } from '@/components/ui/button';
-import { playChord } from '@/lib/chord-audio';
+import {
+  GUITAR_TYPES,
+  type GuitarType,
+  playChord,
+  setGuitarType,
+} from '@/lib/chord-audio';
 import type { StringState } from '@/types/chord';
 import { STRING_NAMES_LOW_TO_HIGH } from '@/types/chord';
 import { AndImage } from '../and/and-image';
@@ -59,6 +64,9 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
     const svgRef = (ref as React.RefObject<SVGSVGElement>) || internalRef;
     const [downloadFormat, setDownloadFormat] = useState<DownloadFormat>('png');
     const [diagramSize, setDiagramSize] = useState<DiagramSize>(size || 'md');
+    const [guitarType, setGuitarTypeState] = useState<GuitarType>(
+      'acoustic_guitar_nylon'
+    );
 
     // User's preferred drag size (from localStorage) - used for dragged images in static mode
     const [userPreferredSize, setUserPreferredSize] =
@@ -77,6 +85,11 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
           setDiagramSize(savedSize as DiagramSize);
         }
       }
+      const savedGuitar = localStorage.getItem('chord-diagram-guitar');
+      if (savedGuitar && savedGuitar in GUITAR_TYPES) {
+        setGuitarTypeState(savedGuitar as GuitarType);
+        setGuitarType(savedGuitar as GuitarType);
+      }
     }, [size]);
     const [pngDataUrl, setPngDataUrl] = useState<string | null>(null);
     const [xlPngDataUrl, setXlPngDataUrl] = useState<string | null>(null);
@@ -91,6 +104,11 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
         localStorage.setItem('chord-diagram-size', diagramSize);
       }
     }, [diagramSize, size]);
+
+    useEffect(() => {
+      localStorage.setItem('chord-diagram-guitar', guitarType);
+      setGuitarType(guitarType);
+    }, [guitarType]);
 
     // Use prop size if provided (for fixed size previews), otherwise use internal state
     const effectiveSize = size || diagramSize;
@@ -664,6 +682,24 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
                     </button>
                   ))}
                 </div>
+              </div>
+              <div className="flex items-center gap-2 text-muted-foreground text-xs">
+                <span className="w-10 shrink-0">Guitar</span>
+                <select
+                  className="flex-1 cursor-pointer rounded bg-background/50 px-1 py-0.5 text-xs transition-colors hover:bg-background"
+                  onChange={(e) =>
+                    setGuitarTypeState(e.target.value as GuitarType)
+                  }
+                  value={guitarType}
+                >
+                  {(Object.entries(GUITAR_TYPES) as [GuitarType, string][]).map(
+                    ([key, label]) => (
+                      <option key={key} value={key}>
+                        {label}
+                      </option>
+                    )
+                  )}
+                </select>
               </div>
               <div className="flex items-center gap-2 text-muted-foreground text-xs">
                 <span className="w-10 shrink-0">Play</span>
