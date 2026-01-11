@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { COMMON_CHORDS, searchChords } from '@/lib/chord-data';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -6,47 +7,15 @@ export async function GET(request: Request) {
   const nameLike = searchParams.get('nameLike');
 
   if (!chordName && !nameLike) {
-    return NextResponse.json(
-      { error: 'Missing chord name parameter' },
-      { status: 400 }
-    );
+    return NextResponse.json(COMMON_CHORDS);
   }
 
-  try {
-    let url: string;
+  const query = nameLike || chordName || '';
+  const results = searchChords(query);
 
-    if (nameLike) {
-      url = `https://api.uberchord.com/v1/chords?nameLike=${encodeURIComponent(nameLike)}`;
-    } else if (chordName) {
-      const formattedName = chordName.replace(/,/g, '_');
-      url = `https://api.uberchord.com/v1/chords/${encodeURIComponent(formattedName)}`;
-    } else {
-      return NextResponse.json(
-        { error: 'Missing chord name parameter' },
-        { status: 400 }
-      );
-    }
-
-    const response = await fetch(url, {
-      headers: {
-        Accept: 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      return NextResponse.json(
-        { error: 'Chord not found' },
-        { status: response.status }
-      );
-    }
-
-    const data = await response.json();
-    return NextResponse.json(data);
-  } catch (error) {
-    console.error('Error fetching chord:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch chord data' },
-      { status: 500 }
-    );
+  if (results.length === 0) {
+    return NextResponse.json({ error: 'Chord not found' }, { status: 404 });
   }
+
+  return NextResponse.json(results);
 }

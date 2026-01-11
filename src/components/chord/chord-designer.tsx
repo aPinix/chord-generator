@@ -1,8 +1,6 @@
 'use client';
 
-import { Download, RotateCcw } from 'lucide-react';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { useCallback, useEffect, useState } from 'react';
 import {
   Card,
   CardContent,
@@ -32,7 +30,6 @@ export function ChordDesigner() {
   const [detectedName, setDetectedName] = useState<string | null>(null);
   const [customName, setCustomName] = useState('');
   const [useCustom, setUseCustom] = useState(false);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   // Detect chord name when strings change
   useEffect(() => {
@@ -82,16 +79,6 @@ export function ChordDesigner() {
     setUseCustom(false);
   }, []);
 
-  const handleDownload = useCallback(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const link = document.createElement('a');
-    link.download = `${chordName || 'chord'}-diagram.png`;
-    link.href = canvas.toDataURL('image/png');
-    link.click();
-  }, [chordName]);
-
   return (
     <div className="flex flex-col gap-8">
       {/* Search Section */}
@@ -103,6 +90,10 @@ export function ChordDesigner() {
             </span>
             Search Chords
           </CardTitle>
+          <CardDescription>
+            Search for chords by name or partial name. You can also browse all
+            chords.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <ChordSearch onChordSelect={handleChordSelect} />
@@ -176,12 +167,16 @@ export function ChordDesigner() {
                   Pinky
                 </span>
               </div>
-              <span className="ml-auto text-muted-foreground text-xs">
-                Click to cycle{' '}
-                <span className="font-semibold tracking-tight">
-                  (1 → 2 → 3 → 4 → clear)
+              <div className="ml-auto flex flex-col gap-0.5 text-right text-muted-foreground text-xs">
+                <span>
+                  <span className="font-semibold">Click</span> to increase{' '}
+                  <span className="tracking-tight">(• → 1 → 2 → 3 → 4)</span>
                 </span>
-              </span>
+                <span>
+                  <span className="font-semibold">Right-click</span> or{' '}
+                  <span className="font-semibold">Shift+click</span> to decrease
+                </span>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -205,7 +200,7 @@ export function ChordDesigner() {
                 {/* Detected chord button */}
                 {detectedName && (
                   <button
-                    className={`rounded-lg border px-3 py-2 font-medium text-sm transition-colors ${
+                    className={`cursor-pointer rounded-lg border px-3 py-2 font-medium text-sm transition-colors ${
                       !useCustom
                         ? 'border-primary bg-primary/10 text-primary'
                         : 'border-border bg-muted/50 text-muted-foreground hover:bg-muted'
@@ -226,7 +221,7 @@ export function ChordDesigner() {
                   }`}
                 >
                   <button
-                    className={`inline-flex size-6 shrink-0 items-center justify-center rounded-full p-0 text-xs transition-colors ${
+                    className={`inline-flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-full p-0 text-xs transition-colors ${
                       useCustom
                         ? 'bg-primary/20 text-primary'
                         : 'text-muted-foreground hover:text-foreground'
@@ -252,24 +247,9 @@ export function ChordDesigner() {
 
             <ChordDiagram
               chordName={chordName}
-              ref={canvasRef}
+              onReset={handleReset}
               strings={strings}
             />
-
-            <div className="flex w-full gap-2">
-              <Button
-                className="flex-1"
-                onClick={handleReset}
-                variant="outline"
-              >
-                <RotateCcw className="size-4" />
-                Reset
-              </Button>
-              <Button className="flex-1" onClick={handleDownload}>
-                <Download className="size-4" />
-                Download
-              </Button>
-            </div>
           </CardContent>
         </Card>
       </div>

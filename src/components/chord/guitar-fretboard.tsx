@@ -33,17 +33,29 @@ export function GuitarFretboard({
   visibleFrets = TOTAL_FRETS,
 }: GuitarFretboardProps) {
   const handleFretClick = useCallback(
-    (stringIndex: number, fret: number) => {
+    (stringIndex: number, fret: number, decrease: boolean = false) => {
       const currentState = strings[stringIndex];
       if (currentState.fret === fret) {
         // Position already active - cycle finger number
         if (onFingerChange) {
           const currentFinger = currentState.finger;
-          const nextFinger = currentFinger
-            ? currentFinger >= 4
-              ? undefined
-              : currentFinger + 1
-            : 1;
+          let nextFinger: number | undefined;
+
+          if (decrease) {
+            // Decrease: undefined → 4 → 3 → 2 → 1 → undefined
+            nextFinger = currentFinger
+              ? currentFinger <= 1
+                ? undefined
+                : currentFinger - 1
+              : 4;
+          } else {
+            // Increase: undefined → 1 → 2 → 3 → 4 → undefined
+            nextFinger = currentFinger
+              ? currentFinger >= 4
+                ? undefined
+                : currentFinger + 1
+              : 1;
+          }
           onFingerChange(stringIndex, nextFinger);
         }
       } else {
@@ -94,7 +106,7 @@ export function GuitarFretboard({
                 >
                   <button
                     className={cn(
-                      'flex size-7 touch-manipulation items-center justify-center rounded-full font-bold text-xs transition-all sm:size-6',
+                      'flex size-7 cursor-pointer touch-manipulation items-center justify-center rounded-full font-bold text-xs transition-all sm:size-6',
                       isMuted &&
                         'bg-red-500/30 text-red-700 dark:bg-red-500/20 dark:text-red-400',
                       isOpen &&
@@ -184,13 +196,19 @@ export function GuitarFretboard({
                       return (
                         <button
                           className={cn(
-                            'group relative flex h-11 w-12 touch-manipulation items-center justify-center transition-all sm:h-10 sm:w-14',
+                            'group relative flex h-11 w-12 cursor-pointer touch-manipulation items-center justify-center transition-all sm:h-10 sm:w-14',
                             'hover:bg-white/10'
                             // isActive && 'bg-white/20'
                           )}
                           // biome-ignore lint/suspicious/noArrayIndexKey: String positions are fixed (6 strings never reorder)
                           key={`fret-${fretNum}-string-${stringIndex}`}
-                          onClick={() => handleFretClick(stringIndex, fretNum)}
+                          onClick={(e) =>
+                            handleFretClick(stringIndex, fretNum, e.shiftKey)
+                          }
+                          onContextMenu={(e) => {
+                            e.preventDefault();
+                            handleFretClick(stringIndex, fretNum, true);
+                          }}
                           type="button"
                         >
                           {/* String line - metallic look */}

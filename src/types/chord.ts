@@ -4,6 +4,12 @@ export interface ChordData {
   chordName: string;
 }
 
+export interface VexChordBarre {
+  fromString: number;
+  toString: number;
+  fret: number;
+}
+
 export interface FretPosition {
   string: number;
   fret: number;

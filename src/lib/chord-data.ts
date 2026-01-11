@@ -1,247 +1,145 @@
 import type { ChordData } from '@/types/chord';
 
+// Chord data based on vexflow.com/vexchords - The Little Chord Chart
+// Format: strings from low E to high E, fingering matches
 export const COMMON_CHORDS: ChordData[] = [
-  // A chords
-  { chordName: 'A,,,', strings: 'X 0 2 2 2 0', fingering: 'X X 2 1 3 X' },
-  { chordName: 'A,m,,', strings: 'X 0 2 2 1 0', fingering: 'X X 2 3 1 X' },
-  { chordName: 'A,,7,', strings: 'X 0 2 0 2 0', fingering: 'X X 2 X 3 X' },
-  { chordName: 'A,m,,7,', strings: 'X 0 2 0 1 0', fingering: 'X X 2 X 1 X' },
-  { chordName: 'A,maj,7,', strings: 'X 0 2 1 2 0', fingering: 'X X 2 1 3 X' },
-  { chordName: 'A,,6,', strings: 'X 0 2 2 2 2', fingering: 'X X 1 1 1 1' },
-  { chordName: 'A,m,,6,', strings: 'X 0 2 2 1 2', fingering: 'X X 2 3 1 4' },
-  { chordName: 'A,,9,', strings: 'X 0 2 4 2 3', fingering: 'X X 1 3 1 2' },
-  { chordName: 'A,m,,9,', strings: 'X 0 2 4 1 0', fingering: 'X X 1 4 2 X' },
-  { chordName: 'A,add,9,', strings: 'X 0 2 2 0 0', fingering: 'X X 2 3 X X' },
-  { chordName: 'A,sus,2,', strings: 'X 0 2 2 0 0', fingering: 'X X 2 3 X X' },
-  { chordName: 'A,sus,4,', strings: 'X 0 2 2 3 0', fingering: 'X X 1 2 3 X' },
-  { chordName: 'A,,7sus4,', strings: 'X 0 2 0 3 0', fingering: 'X X 1 X 2 X' },
-  { chordName: 'A,,11,', strings: 'X 0 0 0 2 0', fingering: 'X X X X 1 X' },
-  { chordName: 'A,,13,', strings: 'X 0 2 0 2 2', fingering: 'X X 2 X 3 4' },
-  { chordName: 'A,,5,', strings: 'X 0 2 2 X X', fingering: 'X X 1 2 X X' },
-  { chordName: 'A,dim,,', strings: 'X 0 1 2 1 X', fingering: 'X X 1 3 2 X' },
-  { chordName: 'A,dim,,7,', strings: 'X 0 1 2 1 2', fingering: 'X X 1 3 2 4' },
-  { chordName: 'A,aug,,', strings: 'X 0 3 2 2 1', fingering: 'X X 4 2 3 1' },
-  // A# / Bb chords
-  { chordName: 'A#,,,', strings: 'X 1 3 3 3 1', fingering: 'X 1 2 3 4 1' },
-  { chordName: 'A#,m,,', strings: 'X 1 3 3 2 1', fingering: 'X 1 3 4 2 1' },
-  { chordName: 'A#,,7,', strings: 'X 1 3 1 3 1', fingering: 'X 1 3 1 4 1' },
-  { chordName: 'A#,m,,7,', strings: 'X 1 3 1 2 1', fingering: 'X 1 3 1 2 1' },
-  { chordName: 'A#,maj,7,', strings: 'X 1 3 2 3 1', fingering: 'X 1 3 2 4 1' },
-  { chordName: 'A#,,6,', strings: 'X 1 3 3 3 3', fingering: 'X 1 2 2 2 2' },
-  { chordName: 'A#,m,,6,', strings: 'X 1 3 3 2 3', fingering: 'X 1 3 4 2 4' },
-  { chordName: 'A#,,9,', strings: 'X 1 0 1 1 1', fingering: 'X 1 X 2 2 2' },
-  { chordName: 'A#,sus,2,', strings: 'X 1 3 3 1 1', fingering: 'X 1 3 4 1 1' },
-  { chordName: 'A#,sus,4,', strings: 'X 1 3 3 4 1', fingering: 'X 1 2 3 4 1' },
-  { chordName: 'A#,,7sus4,', strings: 'X 1 3 1 4 1', fingering: 'X 1 3 1 4 1' },
-  { chordName: 'A#,,5,', strings: 'X 1 3 3 X X', fingering: 'X 1 3 4 X X' },
-  { chordName: 'A#,dim,,', strings: 'X 1 2 3 2 X', fingering: 'X 1 2 4 3 X' },
-  { chordName: 'A#,aug,,', strings: 'X 1 4 3 3 2', fingering: 'X 1 4 2 3 1' },
-  // B chords
-  { chordName: 'B,,,', strings: 'X 2 4 4 4 2', fingering: 'X 1 2 3 4 1' },
-  { chordName: 'B,m,,', strings: 'X 2 4 4 3 2', fingering: 'X 1 3 4 2 1' },
-  { chordName: 'B,,7,', strings: 'X 2 1 2 0 2', fingering: 'X 2 1 3 X 4' },
-  { chordName: 'B,m,,7,', strings: 'X 2 0 2 0 2', fingering: 'X 1 X 2 X 3' },
-  { chordName: 'B,maj,7,', strings: 'X 2 4 3 4 2', fingering: 'X 1 3 2 4 1' },
-  { chordName: 'B,,6,', strings: 'X 2 4 4 4 4', fingering: 'X 1 2 2 2 2' },
-  { chordName: 'B,m,,6,', strings: 'X 2 4 4 3 4', fingering: 'X 1 3 4 2 4' },
-  { chordName: 'B,,9,', strings: 'X 2 1 2 2 2', fingering: 'X 2 1 3 3 3' },
-  { chordName: 'B,m,,9,', strings: 'X 2 0 2 2 2', fingering: 'X 2 X 3 3 3' },
-  { chordName: 'B,add,9,', strings: 'X 2 4 4 2 2', fingering: 'X 1 3 4 1 1' },
-  { chordName: 'B,sus,2,', strings: 'X 2 4 4 2 2', fingering: 'X 1 3 4 1 1' },
-  { chordName: 'B,sus,4,', strings: 'X 2 4 4 5 2', fingering: 'X 1 2 3 4 1' },
-  { chordName: 'B,,7sus4,', strings: 'X 2 4 2 5 2', fingering: 'X 1 3 1 4 1' },
-  { chordName: 'B,,11,', strings: 'X 2 2 2 4 2', fingering: 'X 1 1 1 3 1' },
-  { chordName: 'B,,5,', strings: 'X 2 4 4 X X', fingering: 'X 1 3 4 X X' },
-  { chordName: 'B,dim,,', strings: 'X 2 3 4 3 X', fingering: 'X 1 2 4 3 X' },
-  { chordName: 'B,dim,,7,', strings: 'X 2 3 1 3 X', fingering: 'X 2 3 1 4 X' },
-  { chordName: 'B,aug,,', strings: 'X 2 5 4 4 3', fingering: 'X 1 4 2 3 1' },
-  // C chords
+  // === OPEN CHORDS ===
+  // C Major: [[1, 0], [2, 1, '1'], [3, 0], [4, 2, 2], [5, 3, 3]]
   { chordName: 'C,,,', strings: 'X 3 2 0 1 0', fingering: 'X 3 2 X 1 X' },
-  { chordName: 'C,m,,', strings: 'X 3 5 5 4 3', fingering: 'X 1 3 4 2 1' },
-  { chordName: 'C,,7,', strings: 'X 3 2 3 1 0', fingering: 'X 3 2 4 1 X' },
-  { chordName: 'C,m,,7,', strings: 'X 3 5 3 4 3', fingering: 'X 1 3 1 2 1' },
-  { chordName: 'C,maj,7,', strings: 'X 3 2 0 0 0', fingering: 'X 3 2 X X X' },
-  { chordName: 'C,,6,', strings: 'X 3 2 2 1 0', fingering: 'X 4 2 3 1 X' },
-  { chordName: 'C,m,,6,', strings: 'X 3 1 2 1 3', fingering: 'X 3 1 2 1 4' },
-  { chordName: 'C,,9,', strings: 'X 3 2 3 3 3', fingering: 'X 2 1 3 3 3' },
-  { chordName: 'C,m,,9,', strings: 'X 3 1 3 3 3', fingering: 'X 2 1 3 3 3' },
-  { chordName: 'C,add,9,', strings: 'X 3 2 0 3 0', fingering: 'X 2 1 X 3 X' },
-  { chordName: 'C,sus,2,', strings: 'X 3 0 0 1 0', fingering: 'X 3 X X 1 X' },
-  { chordName: 'C,sus,4,', strings: 'X 3 3 0 1 1', fingering: 'X 3 4 X 1 1' },
-  { chordName: 'C,,7sus4,', strings: 'X 3 3 3 1 1', fingering: 'X 2 3 4 1 1' },
-  { chordName: 'C,,11,', strings: 'X 3 3 3 5 3', fingering: 'X 1 1 1 3 1' },
-  { chordName: 'C,,13,', strings: 'X 3 2 3 3 5', fingering: 'X 2 1 3 3 4' },
-  { chordName: 'C,,5,', strings: 'X 3 5 5 X X', fingering: 'X 1 3 4 X X' },
-  { chordName: 'C,dim,,', strings: 'X 3 4 5 4 X', fingering: 'X 1 2 4 3 X' },
-  { chordName: 'C,dim,,7,', strings: 'X 3 4 2 4 X', fingering: 'X 2 3 1 4 X' },
-  { chordName: 'C,aug,,', strings: 'X 3 2 1 1 0', fingering: 'X 4 3 1 2 X' },
-  // C# / Db chords
-  { chordName: 'C#,,,', strings: 'X 4 6 6 6 4', fingering: 'X 1 2 3 4 1' },
-  { chordName: 'C#,m,,', strings: 'X 4 6 6 5 4', fingering: 'X 1 3 4 2 1' },
-  { chordName: 'C#,,7,', strings: 'X 4 6 4 6 4', fingering: 'X 1 3 1 4 1' },
-  { chordName: 'C#,m,,7,', strings: 'X 4 6 4 5 4', fingering: 'X 1 3 1 2 1' },
-  { chordName: 'C#,maj,7,', strings: 'X 4 6 5 6 4', fingering: 'X 1 3 2 4 1' },
-  { chordName: 'C#,,6,', strings: 'X 4 6 6 6 6', fingering: 'X 1 2 2 2 2' },
-  { chordName: 'C#,m,,6,', strings: 'X 4 6 6 5 6', fingering: 'X 1 3 4 2 4' },
-  { chordName: 'C#,,9,', strings: 'X 4 3 4 4 4', fingering: 'X 2 1 3 3 3' },
-  { chordName: 'C#,sus,2,', strings: 'X 4 6 6 4 4', fingering: 'X 1 3 4 1 1' },
-  { chordName: 'C#,sus,4,', strings: 'X 4 6 6 7 4', fingering: 'X 1 2 3 4 1' },
-  { chordName: 'C#,,7sus4,', strings: 'X 4 6 4 7 4', fingering: 'X 1 3 1 4 1' },
-  { chordName: 'C#,,5,', strings: 'X 4 6 6 X X', fingering: 'X 1 3 4 X X' },
-  { chordName: 'C#,dim,,', strings: 'X 4 5 6 5 X', fingering: 'X 1 2 4 3 X' },
-  { chordName: 'C#,aug,,', strings: 'X 4 3 2 2 1', fingering: 'X 4 3 1 2 1' },
-  // D chords
+  // D Major: [[1, 2, 2], [2, 3, 3], [3, 2, '1'], [4, 0, 'D'], [5, 'x'], [6, 'x']]
   { chordName: 'D,,,', strings: 'X X 0 2 3 2', fingering: 'X X X 1 3 2' },
-  { chordName: 'D,m,,', strings: 'X X 0 2 3 1', fingering: 'X X X 2 3 1' },
-  { chordName: 'D,,7,', strings: 'X X 0 2 1 2', fingering: 'X X X 2 1 3' },
-  { chordName: 'D,m,,7,', strings: 'X X 0 2 1 1', fingering: 'X X X 2 1 1' },
-  { chordName: 'D,maj,7,', strings: 'X X 0 2 2 2', fingering: 'X X X 1 1 1' },
-  { chordName: 'D,,6,', strings: 'X X 0 2 0 2', fingering: 'X X X 1 X 2' },
-  { chordName: 'D,m,,6,', strings: 'X X 0 2 0 1', fingering: 'X X X 2 X 1' },
-  { chordName: 'D,,9,', strings: 'X X 0 2 1 0', fingering: 'X X X 2 1 X' },
-  { chordName: 'D,m,,9,', strings: 'X X 0 2 1 0', fingering: 'X X X 2 1 X' },
-  { chordName: 'D,add,9,', strings: 'X X 0 2 3 0', fingering: 'X X X 1 3 X' },
-  { chordName: 'D,sus,2,', strings: 'X X 0 2 3 0', fingering: 'X X X 1 3 X' },
-  { chordName: 'D,sus,4,', strings: 'X X 0 2 3 3', fingering: 'X X X 1 2 3' },
-  { chordName: 'D,,7sus4,', strings: 'X X 0 2 1 3', fingering: 'X X X 2 1 4' },
-  { chordName: 'D,,11,', strings: 'X X 0 0 1 0', fingering: 'X X X X 1 X' },
-  { chordName: 'D,,13,', strings: 'X X 0 2 1 2', fingering: 'X X X 2 1 3' },
-  { chordName: 'D,,5,', strings: 'X X 0 2 3 X', fingering: 'X X X 1 2 X' },
-  { chordName: 'D,dim,,', strings: 'X X 0 1 3 1', fingering: 'X X X 1 3 2' },
-  { chordName: 'D,dim,,7,', strings: 'X X 0 1 0 1', fingering: 'X X X 1 X 2' },
-  { chordName: 'D,aug,,', strings: 'X X 0 3 3 2', fingering: 'X X X 2 3 1' },
-  // D# / Eb chords
-  { chordName: 'D#,,,', strings: 'X 6 8 8 8 6', fingering: 'X 1 2 3 4 1' },
-  { chordName: 'D#,m,,', strings: 'X 6 8 8 7 6', fingering: 'X 1 3 4 2 1' },
-  { chordName: 'D#,,7,', strings: 'X 6 8 6 8 6', fingering: 'X 1 3 1 4 1' },
-  { chordName: 'D#,m,,7,', strings: 'X 6 8 6 7 6', fingering: 'X 1 3 1 2 1' },
-  { chordName: 'D#,maj,7,', strings: 'X 6 8 7 8 6', fingering: 'X 1 3 2 4 1' },
-  { chordName: 'D#,,6,', strings: 'X 6 8 8 8 8', fingering: 'X 1 2 2 2 2' },
-  { chordName: 'D#,m,,6,', strings: 'X 6 8 8 7 8', fingering: 'X 1 3 4 2 4' },
-  { chordName: 'D#,,9,', strings: 'X 6 5 6 6 6', fingering: 'X 2 1 3 3 3' },
-  { chordName: 'D#,sus,2,', strings: 'X 6 8 8 6 6', fingering: 'X 1 3 4 1 1' },
-  { chordName: 'D#,sus,4,', strings: 'X 6 8 8 9 6', fingering: 'X 1 2 3 4 1' },
-  { chordName: 'D#,,7sus4,', strings: 'X 6 8 6 9 6', fingering: 'X 1 3 1 4 1' },
-  { chordName: 'D#,,5,', strings: 'X 6 8 8 X X', fingering: 'X 1 3 4 X X' },
-  { chordName: 'D#,dim,,', strings: 'X 6 7 8 7 X', fingering: 'X 1 2 4 3 X' },
-  { chordName: 'D#,aug,,', strings: 'X 6 5 4 4 3', fingering: 'X 4 3 1 2 1' },
-  // E chords
+  // E Major: [[1, 0, 'E'], [2, 0], [3, 1, 1], [4, 2, 3], [5, 2, 2], [6, 0, 'E']]
   { chordName: 'E,,,', strings: '0 2 2 1 0 0', fingering: 'X 2 3 1 X X' },
+  // G Major: [[1, 3, 4], [2, 3, 3], [3, 0, 'G'], [4, 0], [5, 2, 1], [6, 3, 2]]
+  { chordName: 'G,,,', strings: '3 2 0 0 3 3', fingering: '2 1 X X 3 4' },
+  // A Major: [[1, 0], [2, 2, 3], [3, 2, 2], [4, 2, 1], [5, 0, 'A'], [6, 'x']]
+  { chordName: 'A,,,', strings: 'X 0 2 2 2 0', fingering: 'X X 1 2 3 X' },
+  // D Minor: [[1, 1, 1], [2, 3, 3], [3, 2, 2], [4, 0, 'D'], [5, 'x'], [6, 'x']]
+  { chordName: 'D,m,,', strings: 'X X 0 2 3 1', fingering: 'X X X 2 3 1' },
+  // E Minor: [[1, 0], [2, 0], [3, 0], [4, 2, 3], [5, 2, 2], [6, 0, 'E']]
   { chordName: 'E,m,,', strings: '0 2 2 0 0 0', fingering: 'X 2 3 X X X' },
-  { chordName: 'E,,7,', strings: '0 2 0 1 0 0', fingering: 'X 2 X 1 X X' },
-  { chordName: 'E,m,,7,', strings: '0 2 0 0 0 0', fingering: 'X 2 X X X X' },
-  { chordName: 'E,maj,7,', strings: '0 2 1 1 0 0', fingering: 'X 3 1 2 X X' },
-  { chordName: 'E,,6,', strings: '0 2 2 1 2 0', fingering: 'X 2 3 1 4 X' },
-  { chordName: 'E,m,,6,', strings: '0 2 2 0 2 0', fingering: 'X 2 3 X 4 X' },
-  { chordName: 'E,,9,', strings: '0 2 0 1 0 2', fingering: 'X 2 X 1 X 3' },
-  { chordName: 'E,m,,9,', strings: '0 2 0 0 0 2', fingering: 'X 2 X X X 4' },
-  { chordName: 'E,add,9,', strings: '0 2 2 1 0 2', fingering: 'X 2 3 1 X 4' },
-  { chordName: 'E,sus,2,', strings: '0 2 4 4 0 0', fingering: 'X 1 3 4 X X' },
-  { chordName: 'E,sus,4,', strings: '0 2 2 2 0 0', fingering: 'X 2 3 4 X X' },
-  { chordName: 'E,,7sus4,', strings: '0 2 0 2 0 0', fingering: 'X 2 X 3 X X' },
-  { chordName: 'E,,11,', strings: '0 0 0 1 0 0', fingering: 'X X X 1 X X' },
-  { chordName: 'E,,13,', strings: '0 2 0 1 2 0', fingering: 'X 2 X 1 3 X' },
-  { chordName: 'E,,5,', strings: '0 2 2 X X X', fingering: 'X 1 2 X X X' },
-  { chordName: 'E,dim,,', strings: '0 1 2 0 X X', fingering: 'X 1 2 X X X' },
-  { chordName: 'E,dim,,7,', strings: '0 1 2 0 2 0', fingering: 'X 1 3 X 4 X' },
-  { chordName: 'E,aug,,', strings: '0 3 2 1 1 0', fingering: 'X 4 3 1 2 X' },
-  // F chords
+  // A Minor: [[1, 0], [2, 1, 1], [3, 2, 3], [4, 2, 2], [5, 0, 'A'], [6, 'x']]
+  { chordName: 'A,m,,', strings: 'X 0 2 2 1 0', fingering: 'X X 2 3 1 X' },
+  // C7: [[1, 0], [2, 1, 1], [3, 3, 4], [4, 2, 2], [5, 3, 3], [6, 'x']]
+  { chordName: 'C,,7,', strings: 'X 3 2 3 1 0', fingering: 'X 3 2 4 1 X' },
+  // D7: [[1, 2, 3], [2, 1, 1], [3, 2, 2], [4, 0, 'D'], [5, 'x'], [6, 'x']]
+  { chordName: 'D,,7,', strings: 'X X 0 2 1 2', fingering: 'X X X 2 1 3' },
+  // E7: [[1, 0], [2, 3, 4], [3, 1, 1], [4, 0], [5, 2, 2], [6, 0, 'E']]
+  { chordName: 'E,,7,', strings: '0 2 0 1 3 0', fingering: 'X 2 X 1 4 X' },
+  // G7: [[1, 1, 1], [2, 0], [3, 0], [4, 0], [5, 2, 2], [6, 3, 3]]
+  { chordName: 'G,,7,', strings: '3 2 0 0 0 1', fingering: '3 2 X X X 1' },
+  // A7: [[1, 0], [2, 2, 3], [3, 0], [4, 2, 2], [5, 0, 'A'], [6, 'x']]
+  { chordName: 'A,,7,', strings: 'X 0 2 0 2 0', fingering: 'X X 2 X 3 X' },
+  // Dm7: [[3, 2, 2], [4, 0], [5, 'x'], [6, 'x']], barres: [{ fromString: 2, toString: 1, fret: 1 }]
+  { chordName: 'D,m,7,', strings: 'X X 0 2 1 1', fingering: 'X X X 2 1 1' },
+  // Em7: [[1, 0], [2, 3, 4], [3, 0], [4, 0], [5, 2, 1], [6, 0, 'E']]
+  { chordName: 'E,m,7,', strings: '0 2 0 0 3 0', fingering: 'X 1 X X 4 X' },
+  // Am7: [[1, 0], [2, 1, 1], [3, 0], [4, 2, 2], [5, 0, 'A'], [6, 'x']]
+  { chordName: 'A,m,7,', strings: 'X 0 2 0 1 0', fingering: 'X X 2 X 1 X' },
+  // === F CHORDS (E Shape) ===
   { chordName: 'F,,,', strings: '1 3 3 2 1 1', fingering: '1 3 4 2 1 1' },
   { chordName: 'F,m,,', strings: '1 3 3 1 1 1', fingering: '1 3 4 1 1 1' },
   { chordName: 'F,,7,', strings: '1 3 1 2 1 1', fingering: '1 3 1 2 1 1' },
-  { chordName: 'F,m,,7,', strings: '1 3 1 1 1 1', fingering: '1 3 1 1 1 1' },
-  { chordName: 'F,maj,7,', strings: '1 X 2 2 1 0', fingering: '1 X 3 4 2 X' },
-  { chordName: 'F,,6,', strings: '1 3 3 2 3 1', fingering: '1 3 4 2 4 1' },
-  { chordName: 'F,m,,6,', strings: '1 3 3 1 3 1', fingering: '1 3 4 1 4 1' },
-  { chordName: 'F,,9,', strings: '1 3 1 2 1 3', fingering: '1 3 1 2 1 4' },
-  { chordName: 'F,m,,9,', strings: '1 3 1 1 1 3', fingering: '1 3 1 1 1 4' },
-  { chordName: 'F,add,9,', strings: '1 0 3 2 1 1', fingering: '1 X 4 3 1 1' },
+  { chordName: 'F,m,7,', strings: '1 3 1 1 1 1', fingering: '1 3 1 1 1 1' },
+  { chordName: 'F,maj,7,', strings: '1 3 2 2 1 1', fingering: '1 4 2 3 1 1' },
+  { chordName: 'F,m,7b5,', strings: '1 X 1 1 0 1', fingering: '1 X 2 3 X 4' },
+  { chordName: 'F,dim,,', strings: '1 X 0 1 0 1', fingering: '1 X X 2 X 3' },
   { chordName: 'F,sus,2,', strings: '1 3 3 0 1 1', fingering: '1 3 4 X 1 1' },
   { chordName: 'F,sus,4,', strings: '1 3 3 3 1 1', fingering: '1 2 3 4 1 1' },
   { chordName: 'F,,7sus4,', strings: '1 3 1 3 1 1', fingering: '1 3 1 4 1 1' },
-  { chordName: 'F,,11,', strings: '1 1 1 2 1 1', fingering: '1 1 1 2 1 1' },
+  { chordName: 'F,,9,', strings: '1 0 1 0 1 1', fingering: '1 X 2 X 3 4' },
+  { chordName: 'F,,7b9,', strings: '1 0 1 0 1 0', fingering: '2 X 3 X 4 X' },
+  { chordName: 'F,,7#9,', strings: '1 0 1 2 1 2', fingering: '1 X 2 3 1 4' },
   { chordName: 'F,,13,', strings: '1 3 1 2 3 1', fingering: '1 3 1 2 4 1' },
-  { chordName: 'F,,5,', strings: '1 3 3 X X X', fingering: '1 3 4 X X X' },
-  { chordName: 'F,dim,,', strings: '1 2 3 1 X X', fingering: '1 2 4 1 X X' },
-  { chordName: 'F,dim,,7,', strings: '1 2 3 1 3 X', fingering: '1 2 4 1 3 X' },
-  { chordName: 'F,aug,,', strings: '1 X 3 2 2 1', fingering: '1 X 4 2 3 1' },
-  // F# / Gb chords
-  { chordName: 'F#,,,', strings: '2 4 4 3 2 2', fingering: '1 3 4 2 1 1' },
-  { chordName: 'F#,m,,', strings: '2 4 4 2 2 2', fingering: '1 3 4 1 1 1' },
-  { chordName: 'F#,,7,', strings: '2 4 2 3 2 2', fingering: '1 3 1 2 1 1' },
-  { chordName: 'F#,m,,7,', strings: '2 4 2 2 2 2', fingering: '1 3 1 1 1 1' },
-  { chordName: 'F#,maj,7,', strings: '2 X 3 3 2 1', fingering: '1 X 3 4 2 1' },
-  { chordName: 'F#,,6,', strings: '2 4 4 3 4 2', fingering: '1 3 4 2 4 1' },
-  { chordName: 'F#,m,,6,', strings: '2 4 4 2 4 2', fingering: '1 3 4 1 4 1' },
-  { chordName: 'F#,,9,', strings: '2 4 2 3 2 4', fingering: '1 3 1 2 1 4' },
-  { chordName: 'F#,m,,9,', strings: '2 4 2 2 2 4', fingering: '1 3 1 1 1 4' },
-  { chordName: 'F#,add,9,', strings: '2 4 4 3 2 4', fingering: '1 3 4 2 1 4' },
-  { chordName: 'F#,sus,2,', strings: '2 4 4 1 2 2', fingering: '1 3 4 1 1 1' },
-  { chordName: 'F#,sus,4,', strings: '2 4 4 4 2 2', fingering: '1 2 3 4 1 1' },
-  { chordName: 'F#,,7sus4,', strings: '2 4 2 4 2 2', fingering: '1 3 1 4 1 1' },
-  { chordName: 'F#,,5,', strings: '2 4 4 X X X', fingering: '1 3 4 X X X' },
-  { chordName: 'F#,dim,,', strings: '2 3 4 2 X X', fingering: '1 2 4 1 X X' },
-  { chordName: 'F#,dim,,7,', strings: '2 3 4 2 4 X', fingering: '1 2 4 1 3 X' },
-  { chordName: 'F#,aug,,', strings: '2 X 4 3 3 2', fingering: '1 X 4 2 3 1' },
-  // G chords
-  { chordName: 'G,,,', strings: '3 2 0 0 0 3', fingering: '2 1 X X X 3' },
-  { chordName: 'G,m,,', strings: '3 5 5 3 3 3', fingering: '1 3 4 1 1 1' },
-  { chordName: 'G,,7,', strings: '3 2 0 0 0 1', fingering: '3 2 X X X 1' },
-  { chordName: 'G,m,,7,', strings: '3 5 3 3 3 3', fingering: '1 3 1 1 1 1' },
-  { chordName: 'G,maj,7,', strings: '3 2 0 0 0 2', fingering: '2 1 X X X 3' },
-  { chordName: 'G,,6,', strings: '3 2 0 0 0 0', fingering: '2 1 X X X X' },
-  { chordName: 'G,m,,6,', strings: '3 5 5 3 5 3', fingering: '1 3 4 1 4 1' },
-  { chordName: 'G,,9,', strings: '3 X 0 2 0 1', fingering: '3 X X 2 X 1' },
-  { chordName: 'G,m,,9,', strings: '3 5 3 3 3 5', fingering: '1 3 1 1 1 4' },
-  { chordName: 'G,add,9,', strings: '3 0 0 0 0 3', fingering: '2 X X X X 3' },
-  { chordName: 'G,sus,2,', strings: '3 0 0 0 3 3', fingering: '1 X X X 3 4' },
-  { chordName: 'G,sus,4,', strings: '3 5 5 5 3 3', fingering: '1 2 3 4 1 1' },
-  { chordName: 'G,,7sus4,', strings: '3 5 3 5 3 3', fingering: '1 3 1 4 1 1' },
-  { chordName: 'G,,11,', strings: '3 3 0 0 1 1', fingering: '2 3 X X 1 1' },
-  { chordName: 'G,,13,', strings: '3 2 0 0 0 0', fingering: '2 1 X X X X' },
-  { chordName: 'G,,5,', strings: '3 5 5 X X X', fingering: '1 3 4 X X X' },
-  { chordName: 'G,dim,,', strings: '3 4 5 3 X X', fingering: '1 2 4 1 X X' },
-  { chordName: 'G,dim,,7,', strings: '3 4 5 3 5 X', fingering: '1 2 4 1 3 X' },
-  { chordName: 'G,aug,,', strings: '3 X 5 4 4 3', fingering: '1 X 4 2 3 1' },
-  // G# / Ab chords
-  { chordName: 'G#,,,', strings: '4 6 6 5 4 4', fingering: '1 3 4 2 1 1' },
-  { chordName: 'G#,m,,', strings: '4 6 6 4 4 4', fingering: '1 3 4 1 1 1' },
-  { chordName: 'G#,,7,', strings: '4 6 4 5 4 4', fingering: '1 3 1 2 1 1' },
-  { chordName: 'G#,m,,7,', strings: '4 6 4 4 4 4', fingering: '1 3 1 1 1 1' },
-  { chordName: 'G#,maj,7,', strings: '4 X 5 5 4 3', fingering: '1 X 3 4 2 1' },
-  { chordName: 'G#,,6,', strings: '4 6 6 5 6 4', fingering: '1 3 4 2 4 1' },
-  { chordName: 'G#,m,,6,', strings: '4 6 6 4 6 4', fingering: '1 3 4 1 4 1' },
-  { chordName: 'G#,,9,', strings: '4 6 4 5 4 6', fingering: '1 3 1 2 1 4' },
-  { chordName: 'G#,m,,9,', strings: '4 6 4 4 4 6', fingering: '1 3 1 1 1 4' },
-  { chordName: 'G#,add,9,', strings: '4 6 6 5 4 6', fingering: '1 3 4 2 1 4' },
-  { chordName: 'G#,sus,2,', strings: '4 6 6 3 4 4', fingering: '1 3 4 1 1 1' },
-  { chordName: 'G#,sus,4,', strings: '4 6 6 6 4 4', fingering: '1 2 3 4 1 1' },
-  { chordName: 'G#,,7sus4,', strings: '4 6 4 6 4 4', fingering: '1 3 1 4 1 1' },
-  { chordName: 'G#,,5,', strings: '4 6 6 X X X', fingering: '1 3 4 X X X' },
-  { chordName: 'G#,dim,,', strings: '4 5 6 4 X X', fingering: '1 2 4 1 X X' },
-  { chordName: 'G#,dim,,7,', strings: '4 5 6 4 6 X', fingering: '1 2 4 1 3 X' },
-  { chordName: 'G#,aug,,', strings: '4 X 6 5 5 4', fingering: '1 X 4 2 3 1' },
-  // Flat enharmonic equivalents (Bb, Db, Eb, Gb, Ab)
-  { chordName: 'Bb,,,', strings: 'X 1 3 3 3 1', fingering: 'X 1 2 3 4 1' },
+  // === Bb CHORDS (A Shape) ===
+  { chordName: 'Bb,,,', strings: 'X 1 3 3 3 1', fingering: 'X 1 3 3 3 1' },
   { chordName: 'Bb,m,,', strings: 'X 1 3 3 2 1', fingering: 'X 1 3 4 2 1' },
   { chordName: 'Bb,,7,', strings: 'X 1 3 1 3 1', fingering: 'X 1 3 1 4 1' },
+  { chordName: 'Bb,m,7,', strings: 'X 1 3 1 2 1', fingering: 'X 1 3 1 2 1' },
   { chordName: 'Bb,maj,7,', strings: 'X 1 3 2 3 1', fingering: 'X 1 3 2 4 1' },
-  { chordName: 'Db,,,', strings: 'X 4 6 6 6 4', fingering: 'X 1 2 3 4 1' },
-  { chordName: 'Db,m,,', strings: 'X 4 6 6 5 4', fingering: 'X 1 3 4 2 1' },
-  { chordName: 'Db,,7,', strings: 'X 4 6 4 6 4', fingering: 'X 1 3 1 4 1' },
-  { chordName: 'Db,maj,7,', strings: 'X 4 6 5 6 4', fingering: 'X 1 3 2 4 1' },
-  { chordName: 'Eb,,,', strings: 'X 6 8 8 8 6', fingering: 'X 1 2 3 4 1' },
-  { chordName: 'Eb,m,,', strings: 'X 6 8 8 7 6', fingering: 'X 1 3 4 2 1' },
-  { chordName: 'Eb,,7,', strings: 'X 6 8 6 8 6', fingering: 'X 1 3 1 4 1' },
-  { chordName: 'Eb,maj,7,', strings: 'X 6 8 7 8 6', fingering: 'X 1 3 2 4 1' },
-  { chordName: 'Gb,,,', strings: '2 4 4 3 2 2', fingering: '1 3 4 2 1 1' },
-  { chordName: 'Gb,m,,', strings: '2 4 4 2 2 2', fingering: '1 3 4 1 1 1' },
-  { chordName: 'Gb,,7,', strings: '2 4 2 3 2 2', fingering: '1 3 1 2 1 1' },
-  { chordName: 'Gb,maj,7,', strings: '2 X 3 3 2 1', fingering: '1 X 3 4 2 1' },
-  { chordName: 'Ab,,,', strings: '4 6 6 5 4 4', fingering: '1 3 4 2 1 1' },
-  { chordName: 'Ab,m,,', strings: '4 6 6 4 4 4', fingering: '1 3 4 1 1 1' },
-  { chordName: 'Ab,,7,', strings: '4 6 4 5 4 4', fingering: '1 3 1 2 1 1' },
-  { chordName: 'Ab,maj,7,', strings: '4 X 5 5 4 3', fingering: '1 X 3 4 2 1' },
+  { chordName: 'Bb,m,7b5,', strings: 'X 1 2 1 2 X', fingering: 'X 1 2 1 3 X' },
+  { chordName: 'Bb,dim,,', strings: 'X 1 2 0 2 X', fingering: 'X 1 2 X 3 X' },
+  { chordName: 'Bb,sus,2,', strings: 'X 1 3 3 1 1', fingering: 'X 1 3 4 1 1' },
+  { chordName: 'Bb,sus,4,', strings: 'X 1 3 3 4 1', fingering: 'X 1 2 3 4 1' },
+  { chordName: 'Bb,,7sus4,', strings: 'X 1 3 1 4 1', fingering: 'X 1 3 1 4 1' },
+  { chordName: 'Bb,,9,', strings: 'X 1 0 1 1 1', fingering: 'X 1 X 2 3 4' },
+  { chordName: 'Bb,,7b9,', strings: 'X 1 0 1 0 1', fingering: 'X 2 X 3 X 4' },
+  { chordName: 'Bb,,7#9,', strings: 'X 1 0 1 2 1', fingering: 'X 1 X 2 3 1' },
+  { chordName: 'Bb,,13,', strings: 'X 1 3 1 3 3', fingering: 'X 1 3 1 2 4' },
+  // === B CHORDS (A Shape) ===
+  { chordName: 'B,,,', strings: 'X 2 4 4 4 2', fingering: 'X 1 3 3 3 1' },
+  { chordName: 'B,m,,', strings: 'X 2 4 4 3 2', fingering: 'X 1 3 4 2 1' },
+  { chordName: 'B,,7,', strings: 'X 2 4 2 4 2', fingering: 'X 1 3 1 4 1' },
+  { chordName: 'B,m,7,', strings: 'X 2 4 2 3 2', fingering: 'X 1 3 1 2 1' },
+  { chordName: 'B,maj,7,', strings: 'X 2 4 3 4 2', fingering: 'X 1 3 2 4 1' },
+  { chordName: 'B,m,7b5,', strings: 'X 2 3 2 3 X', fingering: 'X 1 2 1 3 X' },
+  { chordName: 'B,dim,,', strings: 'X 2 3 1 3 X', fingering: 'X 1 2 X 3 X' },
+  { chordName: 'B,sus,2,', strings: 'X 2 4 4 2 2', fingering: 'X 1 3 4 1 1' },
+  { chordName: 'B,sus,4,', strings: 'X 2 4 4 5 2', fingering: 'X 1 2 3 4 1' },
+  { chordName: 'B,,7sus4,', strings: 'X 2 4 2 5 2', fingering: 'X 1 3 1 4 1' },
+  { chordName: 'B,,9,', strings: 'X 2 1 2 2 2', fingering: 'X 1 X 2 3 4' },
+  { chordName: 'B,,7b9,', strings: 'X 2 1 2 1 2', fingering: 'X 2 X 3 X 4' },
+  { chordName: 'B,,7#9,', strings: 'X 2 1 2 3 2', fingering: 'X 1 X 2 3 1' },
+  { chordName: 'B,,13,', strings: 'X 2 4 2 4 4', fingering: 'X 1 3 1 2 4' },
+  // === C CHORDS (A Shape) ===
+  { chordName: 'C,m,,', strings: 'X 3 5 5 4 3', fingering: 'X 1 3 4 2 1' },
+  { chordName: 'C,m,7,', strings: 'X 3 5 3 4 3', fingering: 'X 1 3 1 2 1' },
+  { chordName: 'C,maj,7,', strings: 'X 3 5 4 5 3', fingering: 'X 1 3 2 4 1' },
+  { chordName: 'C,m,7b5,', strings: 'X 3 4 3 4 X', fingering: 'X 1 2 1 3 X' },
+  { chordName: 'C,dim,,', strings: 'X 3 4 2 4 X', fingering: 'X 1 2 X 3 X' },
+  { chordName: 'C,sus,2,', strings: 'X 3 5 5 3 3', fingering: 'X 1 3 4 1 1' },
+  { chordName: 'C,sus,4,', strings: 'X 3 5 5 6 3', fingering: 'X 1 2 3 4 1' },
+  { chordName: 'C,,7sus4,', strings: 'X 3 5 3 6 3', fingering: 'X 1 3 1 4 1' },
+  { chordName: 'C,,9,', strings: 'X 3 2 3 3 3', fingering: 'X 1 X 2 3 4' },
+  { chordName: 'C,,7b9,', strings: 'X 3 2 3 2 3', fingering: 'X 2 X 3 X 4' },
+  { chordName: 'C,,7#9,', strings: 'X 3 2 3 4 3', fingering: 'X 1 X 2 3 1' },
+  { chordName: 'C,,13,', strings: 'X 3 5 3 5 5', fingering: 'X 1 3 1 2 4' },
+  // === G CHORDS (E Shape barre) ===
+  { chordName: 'G,m,,', strings: '3 5 5 3 3 3', fingering: '1 3 4 1 1 1' },
+  { chordName: 'G,m,7,', strings: '3 5 3 3 3 3', fingering: '1 3 1 1 1 1' },
+  { chordName: 'G,maj,7,', strings: '3 5 4 4 3 3', fingering: '1 4 2 3 1 1' },
+  { chordName: 'G,m,7b5,', strings: '3 X 3 3 2 3', fingering: '1 X 2 3 X 4' },
+  { chordName: 'G,dim,,', strings: '3 X 2 3 2 3', fingering: '1 X X 2 X 3' },
+  { chordName: 'G,sus,2,', strings: '3 5 5 2 3 3', fingering: '1 3 4 X 1 1' },
+  { chordName: 'G,sus,4,', strings: '3 5 5 5 3 3', fingering: '1 2 3 4 1 1' },
+  { chordName: 'G,,7sus4,', strings: '3 5 3 5 3 3', fingering: '1 3 1 4 1 1' },
+  { chordName: 'G,,9,', strings: '3 2 3 2 3 3', fingering: '1 X 2 X 3 4' },
+  { chordName: 'G,,7b9,', strings: '3 2 3 2 3 X', fingering: '2 X 3 X 4 X' },
+  { chordName: 'G,,7#9,', strings: '3 2 3 4 3 4', fingering: '1 X 2 3 1 4' },
+  { chordName: 'G,,13,', strings: '3 5 3 4 5 3', fingering: '1 3 1 2 4 1' },
+  // === A CHORDS (extended) ===
+  { chordName: 'A,m,7b5,', strings: 'X 0 1 0 1 X', fingering: 'X X 1 X 2 X' },
+  { chordName: 'A,dim,,', strings: 'X 0 1 2 1 X', fingering: 'X X 1 3 2 X' },
+  { chordName: 'A,sus,2,', strings: 'X 0 2 2 0 0', fingering: 'X X 1 2 X X' },
+  { chordName: 'A,sus,4,', strings: 'X 0 2 2 3 0', fingering: 'X X 1 2 3 X' },
+  { chordName: 'A,,7sus4,', strings: 'X 0 2 0 3 0', fingering: 'X X 1 X 3 X' },
+  { chordName: 'A,,9,', strings: 'X 0 2 4 2 3', fingering: 'X X 1 3 1 2' },
+  { chordName: 'A,,7b9,', strings: 'X 0 2 0 2 3', fingering: 'X X 1 X 1 2' },
+  { chordName: 'A,,7#9,', strings: 'X 0 2 0 2 3', fingering: 'X X 1 X 1 2' },
+  { chordName: 'A,,13,', strings: 'X 0 2 0 2 2', fingering: 'X X 2 X 3 4' },
+  { chordName: 'A,maj,7,', strings: 'X 0 2 1 2 0', fingering: 'X X 2 1 3 X' },
+  // === E CHORDS (extended) ===
+  { chordName: 'E,m,7b5,', strings: '0 1 0 0 0 0', fingering: 'X 1 X X X X' },
+  { chordName: 'E,dim,,', strings: 'X X 2 3 2 3', fingering: 'X X 1 3 2 4' },
+  { chordName: 'E,sus,2,', strings: '0 2 4 4 0 0', fingering: 'X 1 3 4 X X' },
+  { chordName: 'E,sus,4,', strings: '0 2 2 2 0 0', fingering: 'X 2 3 4 X X' },
+  { chordName: 'E,,7sus4,', strings: '0 2 0 2 0 0', fingering: 'X 2 X 3 X X' },
+  { chordName: 'E,,9,', strings: '0 2 0 1 0 2', fingering: 'X 2 X 1 X 3' },
+  { chordName: 'E,,7b9,', strings: '0 2 0 1 3 0', fingering: 'X 2 X 1 4 X' },
+  { chordName: 'E,,7#9,', strings: '0 2 0 1 3 3', fingering: 'X 2 X 1 3 4' },
+  { chordName: 'E,,13,', strings: '0 2 0 1 2 0', fingering: 'X 2 X 1 3 X' },
+  { chordName: 'E,maj,7,', strings: '0 2 1 1 0 0', fingering: 'X 3 1 2 X X' },
+  // === D CHORDS (extended) ===
+  { chordName: 'D,m,7b5,', strings: 'X X 0 1 1 1', fingering: 'X X X 1 2 3' },
+  { chordName: 'D,dim,,', strings: 'X X 0 1 0 1', fingering: 'X X X 1 X 2' },
+  { chordName: 'D,sus,2,', strings: 'X X 0 2 3 0', fingering: 'X X X 1 3 X' },
+  { chordName: 'D,sus,4,', strings: 'X X 0 2 3 3', fingering: 'X X X 1 2 3' },
+  { chordName: 'D,,7sus4,', strings: 'X X 0 2 1 3', fingering: 'X X X 2 1 4' },
+  { chordName: 'D,,9,', strings: 'X X 0 2 1 0', fingering: 'X X X 2 1 X' },
+  { chordName: 'D,,7b9,', strings: 'X X 0 2 1 3', fingering: 'X X X 2 1 4' },
+  { chordName: 'D,,7#9,', strings: 'X X 0 2 1 3', fingering: 'X X X 2 1 4' },
+  { chordName: 'D,,13,', strings: 'X X 0 2 1 2', fingering: 'X X X 2 1 3' },
+  { chordName: 'D,maj,7,', strings: 'X X 0 2 2 2', fingering: 'X X X 1 1 1' },
 ];
 
 export function normalizeChordQuery(str: string): string {
@@ -308,4 +206,118 @@ export function detectChordName(
 
   // If no exact match, return null
   return null;
+}
+
+// Root notes in order
+export const ROOT_NOTES = ['C', 'D', 'E', 'F', 'G', 'A', 'B'] as const;
+
+// Get all chords grouped by root note
+export function getChordsByRoot(): Record<string, ChordData[]> {
+  const grouped: Record<string, ChordData[]> = {};
+  for (const root of ROOT_NOTES) {
+    grouped[root] = COMMON_CHORDS.filter((chord) =>
+      chord.chordName.startsWith(`${root},`)
+    );
+  }
+  return grouped;
+}
+
+// Chord categories for organized display
+export interface ChordCategory {
+  name: string;
+  description: string;
+  chords: ChordData[];
+}
+
+// Get chords organized by category (matching vexflow.com/vexchords layout)
+export function getChordsByCategory(): ChordCategory[] {
+  const categories: ChordCategory[] = [
+    {
+      name: 'Open Chords',
+      description:
+        'These chords are played in open position, and generally include open strings.',
+      chords: COMMON_CHORDS.filter((c) =>
+        [
+          'C,,,',
+          'D,,,',
+          'E,,,',
+          'G,,,',
+          'A,,,',
+          'D,m,,',
+          'E,m,,',
+          'A,m,,',
+          'C,,7,',
+          'D,,7,',
+          'E,,7,',
+          'G,,7,',
+          'A,,7,',
+          'D,m,7,',
+          'E,m,7,',
+          'A,m,7,',
+        ].includes(c.chordName)
+      ),
+    },
+    {
+      name: 'F Chords (E Shape)',
+      description: 'E-Shaped barre chords in the key of F.',
+      chords: COMMON_CHORDS.filter((c) => c.chordName.startsWith('F,')),
+    },
+    {
+      name: 'Bb Chords (A Shape)',
+      description: 'A-Shaped barre chords in the key of Bb.',
+      chords: COMMON_CHORDS.filter((c) => c.chordName.startsWith('Bb,')),
+    },
+    {
+      name: 'B Chords (A Shape)',
+      description: 'A-Shaped barre chords in the key of B.',
+      chords: COMMON_CHORDS.filter((c) => c.chordName.startsWith('B,')),
+    },
+    {
+      name: 'C Chords (A Shape)',
+      description: 'A-Shaped barre chords in the key of C.',
+      chords: COMMON_CHORDS.filter(
+        (c) =>
+          c.chordName.startsWith('C,') &&
+          !['C,,,', 'C,,7,'].includes(c.chordName)
+      ),
+    },
+    {
+      name: 'G Chords (E Shape)',
+      description: 'E-Shaped barre chords in the key of G.',
+      chords: COMMON_CHORDS.filter(
+        (c) =>
+          c.chordName.startsWith('G,') &&
+          !['G,,,', 'G,,7,'].includes(c.chordName)
+      ),
+    },
+    {
+      name: 'A Chords (Extended)',
+      description: 'Extended chord voicings in the key of A.',
+      chords: COMMON_CHORDS.filter(
+        (c) =>
+          c.chordName.startsWith('A,') &&
+          !['A,,,', 'A,,7,', 'A,m,,', 'A,m,7,'].includes(c.chordName)
+      ),
+    },
+    {
+      name: 'E Chords (Extended)',
+      description: 'Extended chord voicings in the key of E.',
+      chords: COMMON_CHORDS.filter(
+        (c) =>
+          c.chordName.startsWith('E,') &&
+          !['E,,,', 'E,,7,', 'E,m,,', 'E,m,7,'].includes(c.chordName)
+      ),
+    },
+    {
+      name: 'D Chords (Extended)',
+      description: 'Extended chord voicings in the key of D.',
+      chords: COMMON_CHORDS.filter(
+        (c) =>
+          c.chordName.startsWith('D,') &&
+          !['D,,,', 'D,,7,', 'D,m,,', 'D,m,7,'].includes(c.chordName)
+      ),
+    },
+  ];
+
+  return categories.filter((cat) => cat.chords.length > 0);
 }

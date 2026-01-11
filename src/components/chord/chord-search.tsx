@@ -1,27 +1,60 @@
 'use client';
 
-import { Search } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
-import { ChordDiagram } from '@/components/chord/chord-diagram';
+import { Grid3X3, Search } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   formatChordName as formatName,
-  normalizeChordQuery,
+  getChordsByCategory,
   searchChords,
 } from '@/lib/chord-data';
 import type { ChordData, StringState } from '@/types/chord';
+import { ChordDiagram } from './chord-diagram';
 
 interface ChordSearchProps {
   onChordSelect: (strings: StringState[], chordName: string) => void;
+}
+
+// Helper to highlight matching text in search results
+function highlightMatch(text: string, query: string) {
+  if (!query.trim()) return text;
+  const regex = new RegExp(
+    `(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`,
+    'gi'
+  );
+  const parts = text.split(regex);
+  return parts.map((part, i) =>
+    regex.test(part) ? (
+      // biome-ignore lint/suspicious/noArrayIndexKey: Parts derived from static text split
+      <mark className="rounded bg-primary/30 px-0.5 text-primary" key={i}>
+        {part}
+      </mark>
+    ) : (
+      part
+    )
+  );
 }
 
 export function ChordSearch({ onChordSelect }: ChordSearchProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [results, setResults] = useState<ChordData[]>([]);
   const [loading, setLoading] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Debounced search effect
+  const chordCategories = useMemo(() => getChordsByCategory(), []);
+
+  // Debounced search effect using local chord data
   useEffect(() => {
     if (debounceRef.current) {
       clearTimeout(debounceRef.current);
@@ -33,54 +66,11 @@ export function ChordSearch({ onChordSelect }: ChordSearchProps) {
     }
 
     setLoading(true);
-    debounceRef.current = setTimeout(async () => {
-      try {
-        // Try API first
-        const normalizedSearch = normalizeChordQuery(searchQuery);
-        const response = await fetch(
-          `/api/chords?nameLike=${encodeURIComponent(normalizedSearch)}`
-        );
-
-        if (response.ok) {
-          const data = await response.json();
-          if (Array.isArray(data) && data.length > 0) {
-            const sorted = data
-              .filter((chord: ChordData) => {
-                const name = normalizeChordQuery(formatName(chord.chordName));
-                return (
-                  name.includes(normalizedSearch) ||
-                  normalizedSearch.includes(name)
-                );
-              })
-              .sort((a: ChordData, b: ChordData) => {
-                const nameA = normalizeChordQuery(formatName(a.chordName));
-                const nameB = normalizeChordQuery(formatName(b.chordName));
-                const exactA = nameA === normalizedSearch;
-                const exactB = nameB === normalizedSearch;
-                if (exactA && !exactB) return -1;
-                if (exactB && !exactA) return 1;
-                const startsA = nameA.startsWith(normalizedSearch);
-                const startsB = nameB.startsWith(normalizedSearch);
-                if (startsA && !startsB) return -1;
-                if (startsB && !startsA) return 1;
-                return nameA.length - nameB.length;
-              });
-            if (sorted.length > 0) {
-              setResults(sorted);
-              setLoading(false);
-              return;
-            }
-          }
-        }
-      } catch {
-        // API failed, fall through to local search
-      }
-
-      // Fallback to local search
+    debounceRef.current = setTimeout(() => {
       const localResults = searchChords(searchQuery);
       setResults(localResults);
       setLoading(false);
-    }, 300);
+    }, 150);
 
     return () => {
       if (debounceRef.current) {
@@ -118,11 +108,16 @@ export function ChordSearch({ onChordSelect }: ChordSearchProps) {
     onChordSelect(stringStates, formatName(chord.chordName));
   };
 
+  const handleDialogChordClick = (chord: ChordData) => {
+    handleChordClick(chord);
+    setDialogOpen(false);
+  };
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex gap-2">
         <Input
-          className="bg-white dark:bg-zinc-900"
+          className="flex-1 bg-white dark:bg-zinc-900"
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search chords (e.g., Am, G, Fmaj7)"
           value={searchQuery}
@@ -132,6 +127,67 @@ export function ChordSearch({ onChordSelect }: ChordSearchProps) {
             <Search className="size-4 animate-pulse text-muted-foreground" />
           </div>
         )}
+        <Dialog onOpenChange={setDialogOpen} open={dialogOpen}>
+          <DialogTrigger
+            render={
+              <Button size="sm" title="Browse all chords" variant="outline" />
+            }
+          >
+            <Grid3X3 className="size-4" />
+            <span className="text-xs">Browse</span>
+          </DialogTrigger>
+          <DialogContent className="max-h-[calc(100dvh-4rem)]! w-screen! max-w-[calc(100vw-4rem)]! gap-0 overflow-hidden p-0">
+            <DialogHeader className="border-border border-b px-6 py-6">
+              <DialogTitle className="text-2xl">Chord Library</DialogTitle>
+              <DialogDescription className="text-muted-foreground">
+                Browse all chords in the library
+              </DialogDescription>
+            </DialogHeader>
+            <ScrollArea className="max-h-[calc(100vh-12rem)]">
+              <div className="space-y-6 px-6 py-6">
+                {chordCategories.map((category) => (
+                  <div key={category.name}>
+                    <div className="mb-3">
+                      <h3 className="font-semibold text-lg">{category.name}</h3>
+                      <p className="text-muted-foreground text-sm">
+                        {category.description}
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {category.chords.map((chord, index) => {
+                        const displayName = formatName(chord.chordName).replace(
+                          /\//g,
+                          ''
+                        );
+                        return (
+                          <button
+                            className="flex cursor-pointer flex-col items-center rounded-lg border border-transparent transition-colors hover:border-primary"
+                            key={`${chord.chordName}-${index}`}
+                            onClick={() => handleDialogChordClick(chord)}
+                            type="button"
+                          >
+                            <div className="h-fit w-[110px] shrink-0 overflow-hidden">
+                              <ChordDiagram
+                                chordName={displayName}
+                                showControls={false}
+                                size="sm"
+                                static
+                                strings={parseStringsToState(
+                                  chord.strings,
+                                  chord.fingering
+                                )}
+                              />
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
+          </DialogContent>
+        </Dialog>
       </div>
 
       {results.length === 0 && searchQuery && !loading && (
@@ -141,30 +197,45 @@ export function ChordSearch({ onChordSelect }: ChordSearchProps) {
       )}
 
       {results.length > 0 && (
-        <div className="flex max-h-60 flex-col gap-1 overflow-y-auto rounded-lg border border-border p-2">
-          {results.slice(0, 20).map((chord, index) => (
-            <button
-              className="flex items-center gap-3 rounded-md px-3 py-2 text-left text-sm transition-colors hover:bg-muted"
-              key={`${chord.chordName}-${chord.strings}-${index}`}
-              onClick={() => handleChordClick(chord)}
-              type="button"
-            >
-              <div className="h-[84px] w-[60px] shrink-0 overflow-hidden">
-                <ChordDiagram
-                  chordName={formatName(chord.chordName).replace(/\//g, '')}
-                  height={280}
-                  strings={parseStringsToState(chord.strings, chord.fingering)}
-                  width={200}
-                />
-              </div>
-              <span className="flex-1 font-medium">
-                {formatName(chord.chordName).replace(/\//g, '')}
-              </span>
-              <span className="font-mono text-muted-foreground text-xs">
-                {chord.strings}
-              </span>
-            </button>
-          ))}
+        <div className="grid max-h-72 grid-cols-2 gap-2 overflow-y-auto rounded-lg border border-border bg-background p-2 sm:grid-cols-3 md:grid-cols-4">
+          {results.slice(0, 30).map((chord, index) => {
+            const displayName = formatName(chord.chordName).replace(/\//g, '');
+            const isExactMatch =
+              searchQuery.trim().toLowerCase() === displayName.toLowerCase();
+
+            return (
+              <button
+                className={`flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-left transition-colors hover:bg-muted ${
+                  isExactMatch ? 'bg-primary/5 ring-1 ring-primary/20' : ''
+                }`}
+                key={`${chord.chordName}-${chord.strings}-${index}`}
+                onClick={() => handleChordClick(chord)}
+                type="button"
+              >
+                <div className="h-[70px] w-[50px] shrink-0 overflow-hidden">
+                  <ChordDiagram
+                    showControls={false}
+                    size="xs"
+                    static
+                    strings={parseStringsToState(
+                      chord.strings,
+                      chord.fingering
+                    )}
+                  />
+                </div>
+                <div className="flex min-w-0 flex-col">
+                  <span
+                    className={`truncate font-bold text-lg ${isExactMatch ? 'text-primary' : ''}`}
+                  >
+                    {highlightMatch(displayName, searchQuery)}
+                  </span>
+                  <span className="truncate font-mono text-muted-foreground text-xs">
+                    {chord.strings}
+                  </span>
+                </div>
+              </button>
+            );
+          })}
         </div>
       )}
     </div>
