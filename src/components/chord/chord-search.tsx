@@ -164,7 +164,7 @@ export function ChordSearch({ onChordSelect }: ChordSearchProps) {
             className={`size-4 ${loading ? 'animate-pulse' : ''} text-muted-foreground`}
           />
           <Input
-            className="h-auto flex-1 border-0 bg-transparent py-3 shadow-none focus-visible:ring-0"
+            className="h-auto flex-1 border-0 bg-transparent! py-3 shadow-none focus-visible:ring-0"
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search chords (e.g., Am, G, Fmaj7)"
             value={searchQuery}
