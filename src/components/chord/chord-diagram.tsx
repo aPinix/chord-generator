@@ -235,8 +235,29 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
       fingerPositions.forEach((positions, finger) => {
         for (const pos of positions) {
           if (pos.strings.length >= 2) {
-            const minString = Math.min(...pos.strings);
-            const maxString = Math.max(...pos.strings);
+            let minString = Math.min(...pos.strings);
+            let maxString = Math.max(...pos.strings);
+
+            // Extend barre through strings that have any fretted position
+            // Check strings below minString (towards low E)
+            for (let s = minString - 1; s >= 0; s--) {
+              const ss = reversedStrings[s];
+              if (typeof ss.fret === 'number' && ss.fret > 0) {
+                minString = s;
+              } else {
+                break; // Stop extending if string is open or muted
+              }
+            }
+            // Check strings above maxString (towards high E)
+            for (let s = maxString + 1; s < 6; s++) {
+              const ss = reversedStrings[s];
+              if (typeof ss.fret === 'number' && ss.fret > 0) {
+                maxString = s;
+              } else {
+                break; // Stop extending if string is open or muted
+              }
+            }
+
             barres.push({
               finger,
               fret: pos.fret,
