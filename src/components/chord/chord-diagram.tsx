@@ -179,7 +179,7 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
 
     const diagramData = useMemo(() => {
       // Always use base dimensions for SVG rendering
-      const padding = 16; // Side padding
+      const padding = 28; // Side padding (extra space for barre/dots and fret numbers)
       const topMargin = 24; // Space for X/O markers + top spacing
       const bottomMargin = 44; // Space for string names + chord name + bottom spacing
       const diagramWidth = svgWidth - padding * 2;
@@ -518,7 +518,7 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
                 fontFamily="system-ui, sans-serif"
                 fontSize={11}
                 textAnchor="end"
-                x={startX - 2}
+                x={startX - 8}
                 y={startY + fretSpacing / 2 + 4}
               >
                 {startFret}
