@@ -408,8 +408,11 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
         const url = URL.createObjectURL(svgBlob);
 
         img.onload = () => {
-          ctx.fillStyle = '#ffffff';
-          ctx.fillRect(0, 0, outputWidth, outputHeight);
+          // Only add white background for JPG format, keep PNG transparent
+          if (downloadFormat === 'jpg') {
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, outputWidth, outputHeight);
+          }
           ctx.drawImage(img, 0, 0, outputWidth, outputHeight);
           URL.revokeObjectURL(url);
 

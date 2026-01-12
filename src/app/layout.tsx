@@ -5,9 +5,12 @@ import { Footer } from '@/components/footer';
 import { ThemeNameScript } from '@/components/theme/theme-name-script';
 import { Providers } from '@/config/providers.config';
 import {
+  APP_DESCRIPTION,
   APP_FAVICON_DARK,
   APP_FAVICON_LIGHT,
   APP_NAME,
+  APP_SOCIAL_IMAGE,
+  APP_URL,
 } from '@/config/variables.config';
 import { DEBUG_REACT_SCAN } from '@/config/variables-const.config';
 import '../styles/globals.css';
@@ -31,7 +34,30 @@ const fontSkeleton = Flow_Block({
 
 export const metadata: Metadata = {
   title: APP_NAME,
-  description: APP_NAME,
+  description: APP_DESCRIPTION,
+  metadataBase: new URL(APP_URL),
+  openGraph: {
+    title: APP_NAME,
+    description: APP_DESCRIPTION,
+    url: APP_URL,
+    siteName: APP_NAME,
+    images: [
+      {
+        url: APP_SOCIAL_IMAGE,
+        width: 1200,
+        height: 630,
+        alt: APP_NAME,
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: APP_NAME,
+    description: APP_DESCRIPTION,
+    images: [APP_SOCIAL_IMAGE],
+  },
   icons: {
     icon: [
       {
@@ -47,7 +73,7 @@ export const metadata: Metadata = {
     ],
   },
 };
-0;
+
 export default function RootLayout({
   children,
 }: Readonly<{
