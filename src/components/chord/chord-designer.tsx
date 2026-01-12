@@ -291,18 +291,18 @@ export function ChordDesigner() {
               {/* Shortcuts */}
               <div className="flex flex-wrap gap-x-8 gap-y-3 border-muted border-t pt-4 text-sm">
                 <div className="flex items-center gap-3">
-                  <span className="font-medium text-muted-foreground uppercase tracking-wide">
+                  <span className="font-medium text-muted-foreground text-xs uppercase tracking-wide">
                     Mouse:
                   </span>
                   <span className="text-muted-foreground">
-                    <kbd className="rounded-md bg-muted px-2 py-1 font-mono text-xs">
+                    <kbd className="rounded-full bg-muted px-2 py-1 font-mono font-semibold text-xs">
                       Click
                     </kbd>{' '}
                     +1
                   </span>
                   <span className="text-muted-foreground/50">·</span>
                   <span className="text-muted-foreground">
-                    <kbd className="rounded-md bg-muted px-2 py-1 font-mono text-xs">
+                    <kbd className="rounded-full bg-muted px-2 py-1 font-mono font-semibold text-xs">
                       Right-click
                     </kbd>{' '}
                     −1
@@ -313,18 +313,18 @@ export function ChordDesigner() {
               {/* History Shortcuts */}
               <div className="flex flex-wrap gap-x-8 gap-y-3 border-muted border-t pt-4 text-sm">
                 <div className="flex items-center gap-3">
-                  <span className="font-medium text-muted-foreground uppercase tracking-wide">
+                  <span className="font-medium text-muted-foreground text-xs uppercase tracking-wide">
                     History:
                   </span>
                   <span className="text-muted-foreground">
-                    <kbd className="rounded-md bg-muted px-2 py-1 font-mono text-xs">
+                    <kbd className="rounded-full bg-muted px-2 py-1 font-mono font-semibold text-xs">
                       ⌘Z
                     </kbd>{' '}
                     Undo
                   </span>
                   <span className="text-muted-foreground/50">·</span>
                   <span className="text-muted-foreground">
-                    <kbd className="rounded-md bg-muted px-2 py-1 font-mono text-xs">
+                    <kbd className="rounded-full bg-muted px-2 py-1 font-mono font-semibold text-xs">
                       ⌘⇧Z
                     </kbd>{' '}
                     Redo

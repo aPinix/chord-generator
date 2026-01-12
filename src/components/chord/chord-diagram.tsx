@@ -35,9 +35,14 @@ interface ChordDiagramProps {
   showControls?: boolean;
   /** When true, renders SVG directly without PNG conversion for faster display */
   static?: boolean;
+  /** Whether to show finger numbers on the dots */
+  showFingers?: boolean;
+  /** Callback when showFingers changes */
+  onShowFingersChange?: (value: boolean) => void;
 }
 
 const FILL_COLOR = '#545D6A';
+const FILL_MUTED_COLOR = '#8b94a1';
 
 type DownloadFormat = 'png' | 'jpg' | 'svg';
 type DiagramSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
@@ -48,11 +53,11 @@ const BASE_HEIGHT = 160;
 
 // Preview/export sizes - these scale the output, not the SVG internals
 const SIZE_SCALES: Record<DiagramSize, number> = {
-  xs: 0.3,
-  sm: 0.6,
+  xs: 0.5,
+  sm: 0.7,
   md: 1,
-  lg: 1.2,
-  xl: 1.4,
+  lg: 1.3,
+  xl: 1.5,
 };
 
 export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
@@ -63,6 +68,8 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
       size,
       showControls = true,
       static: isStatic = false,
+      showFingers: showFingersProp,
+      onShowFingersChange,
     },
     ref
   ) {
@@ -72,6 +79,19 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
     const [diagramSize, setDiagramSize] = useState<DiagramSize>(size || 'md');
     const [guitarType, setGuitarTypeState] =
       useState<GuitarType>(getGuitarType);
+    const [showFingersInternal, setShowFingersInternal] = useState(true);
+
+    // Use controlled or uncontrolled showFingers
+    const showFingers = showFingersProp ?? showFingersInternal;
+    const setShowFingers = (value: boolean) => {
+      setShowFingersInternal(value);
+      onShowFingersChange?.(value);
+      localStorage.setItem('chord-diagram-fingers', String(value));
+      // Dispatch custom event for same-window sync
+      window.dispatchEvent(
+        new CustomEvent('chord-fingers-change', { detail: value })
+      );
+    };
 
     // User's preferred drag size (from localStorage) - used for dragged images in static mode
     const [userPreferredSize, setUserPreferredSize] =
@@ -95,7 +115,29 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
         setGuitarTypeState(savedGuitar as GuitarType);
         setGuitarType(savedGuitar as GuitarType);
       }
-    }, [size]);
+      const savedFingers = localStorage.getItem('chord-diagram-fingers');
+      if (savedFingers !== null) {
+        const value = savedFingers === 'true';
+        setShowFingersInternal(value);
+        onShowFingersChange?.(value);
+      }
+
+      // Listen for finger toggle changes from other instances
+      const handleFingersChange = (e: CustomEvent<boolean>) => {
+        setShowFingersInternal(e.detail);
+        onShowFingersChange?.(e.detail);
+      };
+      window.addEventListener(
+        'chord-fingers-change',
+        handleFingersChange as EventListener
+      );
+      return () => {
+        window.removeEventListener(
+          'chord-fingers-change',
+          handleFingersChange as EventListener
+        );
+      };
+    }, [size, onShowFingersChange]);
     const [pngDataUrl, setPngDataUrl] = useState<string | null>(null);
     const [xlPngDataUrl, setXlPngDataUrl] = useState<string | null>(null);
 
@@ -308,6 +350,8 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
       xlHeight,
       chordName,
       diagramData,
+      showFingers,
+      isStatic,
     ]);
 
     const downloadImage = useCallback(() => {
@@ -397,31 +441,31 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
             if (stringState.fret === 'X') {
               return (
                 <text
-                  fill={FILL_COLOR}
+                  fill={FILL_MUTED_COLOR}
                   fontFamily="system-ui, sans-serif"
-                  fontSize={14}
+                  fontSize={16}
                   // biome-ignore lint/suspicious/noArrayIndexKey: Static array with unique positions
                   key={`label-${i}`}
                   textAnchor="middle"
                   x={x}
                   y={startY - 4}
                 >
-                  X
+                  ✕
                 </text>
               );
             } else if (stringState.fret === 0) {
               return (
                 <text
-                  fill={FILL_COLOR}
+                  fill={FILL_MUTED_COLOR}
                   fontFamily="system-ui, sans-serif"
-                  fontSize={14}
+                  fontSize={16}
                   // biome-ignore lint/suspicious/noArrayIndexKey: Static array with unique positions
                   key={`label-${i}`}
                   textAnchor="middle"
                   x={x}
                   y={startY - 4}
                 >
-                  O
+                  ○
                 </text>
               );
             }
@@ -451,7 +495,7 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
               <text
                 fill={FILL_COLOR}
                 fontFamily="system-ui, sans-serif"
-                fontSize={10}
+                fontSize={11}
                 textAnchor="end"
                 x={startX - 2}
                 y={startY + fretSpacing / 2 + 4}
@@ -479,7 +523,7 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
             <line
               key={`string-${i}`}
               stroke={FILL_COLOR}
-              strokeWidth={1}
+              strokeWidth={1.5}
               x1={startX + i * stringSpacing}
               x2={startX + i * stringSpacing}
               y1={startY}
@@ -523,7 +567,9 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
                 b.fret === stringState.fret && b.finger === stringState.finger
             );
             const shouldShowFinger =
-              stringState.finger && (!barre || i === barre.startString);
+              showFingers &&
+              stringState.finger &&
+              (!barre || i === barre.startString);
 
             // Center finger number on barre
             const fingerX = barre
@@ -557,9 +603,10 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
           {/* String names - close to fretboard */}
           {STRING_NAMES_LOW_TO_HIGH.map((name, i) => (
             <text
-              fill="#666666"
+              fill={FILL_MUTED_COLOR}
               fontFamily="system-ui, sans-serif"
-              fontSize={12}
+              fontSize={14}
+              fontWeight="semibold"
               // biome-ignore lint/suspicious/noArrayIndexKey: Static array with unique positions
               key={`name-${i}`}
               textAnchor="middle"
@@ -680,6 +727,33 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
                         {f.toUpperCase()}
                       </button>
                     ))}
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 text-muted-foreground text-xs">
+                  <span className="w-12 shrink-0">Fingers</span>
+                  <div className="flex flex-1 overflow-hidden rounded-full bg-muted">
+                    <button
+                      className={`flex-1 cursor-pointer px-2 py-1.5 text-xs transition-colors ${
+                        showFingers
+                          ? 'bg-primary text-primary-foreground'
+                          : 'hover:bg-muted-foreground/10'
+                      }`}
+                      onClick={() => setShowFingers(true)}
+                      type="button"
+                    >
+                      Show
+                    </button>
+                    <button
+                      className={`flex-1 cursor-pointer px-2 py-1.5 text-xs transition-colors ${
+                        !showFingers
+                          ? 'bg-primary text-primary-foreground'
+                          : 'hover:bg-muted-foreground/10'
+                      }`}
+                      onClick={() => setShowFingers(false)}
+                      type="button"
+                    >
+                      Hide
+                    </button>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 text-muted-foreground text-xs">

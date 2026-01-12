@@ -1,7 +1,7 @@
 // app --------------------
 
 // the name of the app
-export const APP_NAME: string = 'Chord Generator';
+export const APP_NAME: string = 'G-Chord';
 export const APP_DESCRIPTION: string =
   'Design custom guitar chords and download them as images.';
 

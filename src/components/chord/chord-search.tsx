@@ -1,7 +1,7 @@
 'use client';
 
-import { Grid3X3, Search } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { Grid2X2, Search } from 'lucide-react';
+import { startTransition, useEffect, useMemo, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -50,9 +50,52 @@ export function ChordSearch({ onChordSelect }: ChordSearchProps) {
   const [results, setResults] = useState<ChordData[]>([]);
   const [loading, setLoading] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [showFingers, setShowFingers] = useState(true);
+  const [dialogReady, setDialogReady] = useState(false);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
   const chordCategories = useMemo(() => getChordsByCategory(), []);
+
+  // Defer rendering of dialog content until after dialog opens
+  useEffect(() => {
+    if (dialogOpen) {
+      startTransition(() => {
+        setDialogReady(true);
+      });
+    } else {
+      setDialogReady(false);
+    }
+  }, [dialogOpen]);
+
+  // Sync showFingers from localStorage and custom events
+  useEffect(() => {
+    const savedFingers = localStorage.getItem('chord-diagram-fingers');
+    if (savedFingers !== null) {
+      setShowFingers(savedFingers === 'true');
+    }
+    // Listen for storage changes from other tabs
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === 'chord-diagram-fingers' && e.newValue !== null) {
+        setShowFingers(e.newValue === 'true');
+      }
+    };
+    // Listen for custom event from same window
+    const handleCustomEvent = (e: CustomEvent<boolean>) => {
+      setShowFingers(e.detail);
+    };
+    window.addEventListener('storage', handleStorage);
+    window.addEventListener(
+      'chord-fingers-change',
+      handleCustomEvent as EventListener
+    );
+    return () => {
+      window.removeEventListener('storage', handleStorage);
+      window.removeEventListener(
+        'chord-fingers-change',
+        handleCustomEvent as EventListener
+      );
+    };
+  }, []);
 
   // Debounced search effect using local chord data
   useEffect(() => {
@@ -137,7 +180,7 @@ export function ChordSearch({ onChordSelect }: ChordSearchProps) {
               />
             }
           >
-            <Grid3X3 className="size-4" />
+            <Grid2X2 className="size-4" />
             <span className="text-sm">Browse</span>
           </DialogTrigger>
           <DialogContent className="max-h-[calc(100dvh-4rem)]! w-screen! max-w-[calc(100vw-4rem)]! gap-0 overflow-hidden p-0">
@@ -147,47 +190,55 @@ export function ChordSearch({ onChordSelect }: ChordSearchProps) {
                 Browse all chords in the library
               </DialogDescription>
             </DialogHeader>
-            <ScrollArea className="max-h-[calc(100vh-12rem)]">
-              <div className="space-y-6 px-6 py-6">
-                {chordCategories.map((category) => (
-                  <div key={category.name}>
-                    <div className="mb-3">
-                      <h3 className="font-semibold text-lg">{category.name}</h3>
-                      <p className="text-muted-foreground text-sm">
-                        {category.description}
-                      </p>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {category.chords.map((chord, index) => {
-                        const displayName = formatName(chord.chordName).replace(
-                          /\//g,
-                          ''
-                        );
-                        return (
-                          <button
-                            className="flex cursor-pointer flex-col items-center rounded-lg border border-transparent transition-colors hover:border-primary"
-                            key={`${chord.chordName}-${index}`}
-                            onClick={() => handleDialogChordClick(chord)}
-                            type="button"
-                          >
-                            <div className="h-fit w-[110px] shrink-0 overflow-hidden">
-                              <ChordDiagram
-                                chordName={displayName}
-                                showControls={false}
-                                size="sm"
-                                static
-                                strings={parseStringsToState(
-                                  chord.strings,
-                                  chord.fingering
-                                )}
-                              />
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </div>
+            <ScrollArea className="h-[calc(100vh-12rem)]">
+              <div className="min-h-[calc(100vh-14rem)] space-y-6 px-6 py-6">
+                {!dialogReady ? (
+                  <div className="flex h-[calc(100vh-16rem)] items-center justify-center">
+                    <div className="size-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
                   </div>
-                ))}
+                ) : (
+                  chordCategories.map((category) => (
+                    <div key={category.name}>
+                      <div className="mb-3">
+                        <h3 className="font-semibold text-lg">
+                          {category.name}
+                        </h3>
+                        <p className="text-muted-foreground text-sm">
+                          {category.description}
+                        </p>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {category.chords.map((chord, index) => {
+                          const displayName = formatName(
+                            chord.chordName
+                          ).replace(/\//g, '');
+                          return (
+                            <button
+                              className="flex cursor-pointer flex-col items-center rounded-lg border border-transparent transition-colors hover:border-primary"
+                              key={`${chord.chordName}-${index}`}
+                              onClick={() => handleDialogChordClick(chord)}
+                              type="button"
+                            >
+                              <div className="h-fit w-[110px] shrink-0 overflow-hidden">
+                                <ChordDiagram
+                                  chordName={displayName}
+                                  showControls={false}
+                                  showFingers={showFingers}
+                                  size="sm"
+                                  static
+                                  strings={parseStringsToState(
+                                    chord.strings,
+                                    chord.fingering
+                                  )}
+                                />
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </ScrollArea>
           </DialogContent>
@@ -219,6 +270,7 @@ export function ChordSearch({ onChordSelect }: ChordSearchProps) {
                 <div className="h-[70px] w-[50px] shrink-0 overflow-hidden">
                   <ChordDiagram
                     showControls={false}
+                    showFingers={showFingers}
                     size="xs"
                     static
                     strings={parseStringsToState(
