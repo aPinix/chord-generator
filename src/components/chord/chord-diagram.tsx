@@ -1,6 +1,7 @@
 'use client';
 
-import { Download, Volume2 } from 'lucide-react';
+import Color from 'color';
+import { Download, RotateCcw, Volume2 } from 'lucide-react';
 import {
   forwardRef,
   useCallback,
@@ -41,8 +42,8 @@ interface ChordDiagramProps {
   onShowFingersChange?: (value: boolean) => void;
 }
 
-const FILL_COLOR = '#545D6A';
-const FILL_MUTED_COLOR = '#8b94a1';
+const DEFAULT_FILL_COLOR = '#545D6A';
+const DEFAULT_BACKGROUND_COLOR = '#FFFFFF';
 
 type DownloadFormat = 'png' | 'jpg' | 'svg';
 type DiagramSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
@@ -76,21 +77,41 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
     const internalRef = useRef<SVGSVGElement>(null);
     const svgRef = (ref as React.RefObject<SVGSVGElement>) || internalRef;
     const [downloadFormat, setDownloadFormat] = useState<DownloadFormat>('png');
-    const [diagramSize, setDiagramSize] = useState<DiagramSize>(size || 'md');
-    const [guitarType, setGuitarTypeState] =
-      useState<GuitarType>(getGuitarType);
-    const [showFingersInternal, setShowFingersInternal] = useState(true);
+    const [diagramSize, setDiagramSize] = useState<DiagramSize>('md');
+    const [guitarType, setGuitarTypeState] = useState<GuitarType>(
+      getGuitarType()
+    );
+    const [showFingersInternal, setShowFingersInternal] = useState(false);
+    const [diagramColor, setDiagramColor] =
+      useState<string>(DEFAULT_FILL_COLOR);
+    const [backgroundColor, setBackgroundColor] = useState<string>(
+      DEFAULT_BACKGROUND_COLOR
+    );
 
     // Use controlled or uncontrolled showFingers
     const showFingers = showFingersProp ?? showFingersInternal;
     const setShowFingers = (value: boolean) => {
       setShowFingersInternal(value);
       onShowFingersChange?.(value);
-      localStorage.setItem('chord-diagram-fingers', String(value));
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('chord-diagram-fingers', String(value));
+      }
       // Dispatch custom event for same-window sync
-      window.dispatchEvent(
-        new CustomEvent('chord-fingers-change', { detail: value })
-      );
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(
+          new CustomEvent('chord-fingers-change', { detail: value })
+        );
+      }
+    };
+
+    // Reset colors to defaults
+    const resetColors = () => {
+      setDiagramColor(DEFAULT_FILL_COLOR);
+      setBackgroundColor(DEFAULT_BACKGROUND_COLOR);
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('chord-diagram-diagram-color');
+        localStorage.removeItem('chord-diagram-background-color');
+      }
     };
 
     // User's preferred drag size (from localStorage) - used for dragged images in static mode
@@ -99,6 +120,8 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
 
     // Sync preferences from localStorage after hydration to avoid SSR mismatch
     useEffect(() => {
+      if (typeof window === 'undefined') return;
+
       const savedFormat = localStorage.getItem('chord-diagram-format');
       if (savedFormat && ['png', 'jpg', 'svg'].includes(savedFormat)) {
         setDownloadFormat(savedFormat as DownloadFormat);
@@ -122,6 +145,20 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
         onShowFingersChange?.(value);
       }
 
+      // Load saved colors
+      const savedDiagramColor = localStorage.getItem(
+        'chord-diagram-diagram-color'
+      );
+      if (savedDiagramColor) {
+        setDiagramColor(savedDiagramColor);
+      }
+      const savedBackgroundColor = localStorage.getItem(
+        'chord-diagram-background-color'
+      );
+      if (savedBackgroundColor) {
+        setBackgroundColor(savedBackgroundColor);
+      }
+
       // Listen for finger toggle changes from other instances
       const handleFingersChange = (e: CustomEvent<boolean>) => {
         setShowFingersInternal(e.detail);
@@ -141,21 +178,49 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
     const [pngDataUrl, setPngDataUrl] = useState<string | null>(null);
     const [xlPngDataUrl, setXlPngDataUrl] = useState<string | null>(null);
 
-    // Persist preferences to localStorage
+    // Separate useEffect for localStorage persistence to avoid dependency issues
     useEffect(() => {
+      if (typeof window === 'undefined') return;
       localStorage.setItem('chord-diagram-format', downloadFormat);
     }, [downloadFormat]);
 
     useEffect(() => {
-      if (!size) {
-        localStorage.setItem('chord-diagram-size', diagramSize);
-      }
+      if (typeof window === 'undefined' || size) return;
+      localStorage.setItem('chord-diagram-size', diagramSize);
     }, [diagramSize, size]);
 
     useEffect(() => {
+      if (typeof window === 'undefined') return;
       localStorage.setItem('chord-diagram-guitar', guitarType);
       setGuitarType(guitarType);
     }, [guitarType]);
+
+    // Persist colors to localStorage
+    useEffect(() => {
+      if (typeof window === 'undefined') return;
+      localStorage.setItem('chord-diagram-diagram-color', diagramColor);
+    }, [diagramColor]);
+
+    useEffect(() => {
+      if (typeof window === 'undefined') return;
+      localStorage.setItem('chord-diagram-background-color', backgroundColor);
+    }, [backgroundColor]);
+
+    // Helper function to parse color with alpha
+    const parseColorWithAlpha = (colorString: string) => {
+      try {
+        const color = Color(colorString);
+        return {
+          hex: color.hex(),
+          alpha: Math.round(color.alpha() * 100),
+        };
+      } catch {
+        return {
+          hex: '#000000',
+          alpha: 100,
+        };
+      }
+    };
 
     // Use prop size if provided (for fixed size previews), otherwise use internal state
     const effectiveSize = size || diagramSize;
@@ -313,7 +378,9 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
     }, [svgRef]);
 
     // Generate PNG previews from SVG - XL for display (non-static), selected size for drag (always)
-    // biome-ignore lint/correctness/useExhaustiveDependencies: chordName and diagramData affect SVG content read via DOM serialization
+    // Note: chordName, diagramData, showFingers, diagramColor are trigger dependencies -
+    // they affect the SVG content which is serialized from svgRef.current
+    // biome-ignore lint/correctness/useExhaustiveDependencies: these deps trigger re-render when SVG content changes
     useEffect(() => {
       const svg = svgRef.current;
       if (!svg) return;
@@ -338,13 +405,20 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
 
       const img = new Image();
       img.onload = () => {
-        // Render selected size for drag
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, outputWidth, outputHeight);
-        ctx.drawImage(img, 0, 0, outputWidth, outputHeight);
-        setPngDataUrl(canvas.toDataURL('image/png'));
+        // Generate based on download format
+        if (downloadFormat === 'jpg') {
+          // JPG needs background color
+          ctx.fillStyle = backgroundColor;
+          ctx.fillRect(0, 0, outputWidth, outputHeight);
+          ctx.drawImage(img, 0, 0, outputWidth, outputHeight);
+          setPngDataUrl(canvas.toDataURL('image/jpeg', 0.95));
+        } else {
+          // PNG - transparent background
+          ctx.drawImage(img, 0, 0, outputWidth, outputHeight);
+          setPngDataUrl(canvas.toDataURL('image/png'));
+        }
 
-        // Only generate XL PNG for display in non-static mode
+        // Only generate XL for display in non-static mode
         if (!isStatic) {
           const xlCanvas = document.createElement('canvas');
           const xlCtx = xlCanvas.getContext('2d');
@@ -352,10 +426,17 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
             xlCanvas.width = xlWidth * dpr;
             xlCanvas.height = xlHeight * dpr;
             xlCtx.scale(dpr, dpr);
-            xlCtx.fillStyle = '#ffffff';
-            xlCtx.fillRect(0, 0, xlWidth, xlHeight);
-            xlCtx.drawImage(img, 0, 0, xlWidth, xlHeight);
-            setXlPngDataUrl(xlCanvas.toDataURL('image/png'));
+            if (downloadFormat === 'jpg') {
+              // JPG needs background color
+              xlCtx.fillStyle = backgroundColor;
+              xlCtx.fillRect(0, 0, xlWidth, xlHeight);
+              xlCtx.drawImage(img, 0, 0, xlWidth, xlHeight);
+              setXlPngDataUrl(xlCanvas.toDataURL('image/jpeg', 0.95));
+            } else {
+              // PNG - transparent background
+              xlCtx.drawImage(img, 0, 0, xlWidth, xlHeight);
+              setXlPngDataUrl(xlCanvas.toDataURL('image/png'));
+            }
           }
         }
 
@@ -373,6 +454,9 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
       diagramData,
       showFingers,
       isStatic,
+      downloadFormat,
+      diagramColor,
+      backgroundColor,
     ]);
 
     const downloadImage = useCallback(() => {
@@ -457,7 +541,10 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
           <title id="chord-title">
             {chordName ? `${chordName} chord diagram` : 'Chord diagram'}
           </title>
-          <rect fill="white" height={svgHeight} width={svgWidth} />
+          {/* Only add white background for JPG format or static display, keep PNG transparent */}
+          {(downloadFormat === 'jpg' || isStatic) && (
+            <rect fill={backgroundColor} height={svgHeight} width={svgWidth} />
+          )}
 
           {/* String labels (X/O) - close to nut */}
           {reversedStrings.map((stringState, i) => {
@@ -465,7 +552,7 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
             if (stringState.fret === 'X') {
               return (
                 <text
-                  fill={FILL_MUTED_COLOR}
+                  fill={diagramColor}
                   fontFamily="system-ui, sans-serif"
                   fontSize={16}
                   // biome-ignore lint/suspicious/noArrayIndexKey: Static array with unique positions
@@ -480,7 +567,7 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
             } else if (stringState.fret === 0) {
               return (
                 <text
-                  fill={FILL_MUTED_COLOR}
+                  fill={diagramColor}
                   fontFamily="system-ui, sans-serif"
                   fontSize={16}
                   // biome-ignore lint/suspicious/noArrayIndexKey: Static array with unique positions
@@ -499,7 +586,7 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
           {/* Nut or fret number */}
           {startFret === 1 ? (
             <line
-              stroke={FILL_COLOR}
+              stroke={diagramColor}
               strokeWidth={3}
               x1={startX}
               x2={startX + diagramWidth}
@@ -509,7 +596,7 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
           ) : (
             <>
               <line
-                stroke={FILL_COLOR}
+                stroke={diagramColor}
                 strokeWidth={1}
                 x1={startX}
                 x2={startX + diagramWidth}
@@ -517,7 +604,7 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
                 y2={startY}
               />
               <text
-                fill={FILL_COLOR}
+                fill={diagramColor}
                 fontFamily="system-ui, sans-serif"
                 fontSize={11}
                 textAnchor="end"
@@ -533,7 +620,7 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
           {[1, 2, 3, 4, 5].map((i) => (
             <line
               key={`fret-${i}`}
-              stroke={FILL_COLOR}
+              stroke={diagramColor}
               strokeWidth={1}
               x1={startX}
               x2={startX + diagramWidth}
@@ -546,7 +633,7 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
           {[0, 1, 2, 3, 4, 5].map((i) => (
             <line
               key={`string-${i}`}
-              stroke={FILL_COLOR}
+              stroke={diagramColor}
               strokeWidth={1.5}
               x1={startX + i * stringSpacing}
               x2={startX + i * stringSpacing}
@@ -564,7 +651,7 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
             const barreHeight = dotRadius * 1.6;
             return (
               <rect
-                fill={FILL_COLOR}
+                fill={diagramColor}
                 height={barreHeight}
                 // biome-ignore lint/suspicious/noArrayIndexKey: Static array with unique positions
                 key={`barre-${idx}`}
@@ -605,7 +692,7 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
               // biome-ignore lint/suspicious/noArrayIndexKey: Static array with unique positions
               <g key={`dot-${i}`}>
                 {!isInBarre && (
-                  <circle cx={x} cy={y} fill={FILL_COLOR} r={dotRadius} />
+                  <circle cx={x} cy={y} fill={diagramColor} r={dotRadius} />
                 )}
                 {shouldShowFinger && (
                   <text
@@ -627,7 +714,7 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
           {/* String names - close to fretboard */}
           {STRING_NAMES_LOW_TO_HIGH.map((name, i) => (
             <text
-              fill={FILL_MUTED_COLOR}
+              fill={diagramColor}
               fontFamily="system-ui, sans-serif"
               fontSize={14}
               fontWeight="semibold"
@@ -644,7 +731,7 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
           {/* Chord name at bottom */}
           {chordName && (
             <text
-              fill={FILL_COLOR}
+              fill={diagramColor}
               fontFamily="system-ui, sans-serif"
               fontSize={16}
               fontWeight="bold"
@@ -679,6 +766,7 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
               draggable={false}
               height={xlHeight}
               src={xlPngDataUrl}
+              style={{ backgroundColor }}
               width={xlWidth}
             />
             {/* Selected-size for drag (invisible overlay) */}
@@ -802,6 +890,87 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
                     </SelectContent>
                   </Select>
                 </div>
+                <div className="flex items-center gap-2 text-muted-foreground text-xs">
+                  <span className="w-12 shrink-0">Colors</span>
+
+                  <div className="flex flex-1 items-center gap-1">
+                    {/* colors */}
+                    <div className="flex gap-2">
+                      <div className="flex items-center gap-1">
+                        <span className="text-xs opacity-70">BG</span>
+                        <div className="relative">
+                          <input
+                            className="absolute h-6 w-6 cursor-pointer opacity-0"
+                            onChange={(e) => {
+                              const current =
+                                parseColorWithAlpha(backgroundColor);
+                              const newColor = Color(e.target.value).alpha(
+                                current.alpha / 100
+                              );
+                              setBackgroundColor(newColor.hex());
+                            }}
+                            title="Background color"
+                            type="color"
+                            value={parseColorWithAlpha(backgroundColor).hex}
+                          />
+                          <button
+                            className="h-6 w-6 cursor-pointer appearance-none rounded-full border-2 border-border transition-colors hover:border-primary"
+                            onClick={(e) => {
+                              const input =
+                                e.currentTarget.parentElement?.querySelector(
+                                  'input'
+                                ) as HTMLInputElement;
+                              input?.click();
+                            }}
+                            style={{ backgroundColor }}
+                            type="button"
+                          />
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <span className="text-xs opacity-70">Lines</span>
+                        <div className="relative">
+                          <input
+                            className="absolute h-6 w-6 cursor-pointer opacity-0"
+                            onChange={(e) => {
+                              const current = parseColorWithAlpha(diagramColor);
+                              const newColor = Color(e.target.value).alpha(
+                                current.alpha / 100
+                              );
+                              setDiagramColor(newColor.hex());
+                            }}
+                            title="Diagram color"
+                            type="color"
+                            value={parseColorWithAlpha(diagramColor).hex}
+                          />
+                          <button
+                            className="h-6 w-6 cursor-pointer appearance-none rounded-full border-2 border-border transition-colors hover:border-primary"
+                            onClick={(e) => {
+                              const input =
+                                e.currentTarget.parentElement?.querySelector(
+                                  'input'
+                                ) as HTMLInputElement;
+                              input?.click();
+                            }}
+                            style={{ backgroundColor: diagramColor }}
+                            type="button"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* reset button */}
+                    <button
+                      className="ml-auto cursor-pointer rounded-full bg-muted p-1 text-xs transition-colors hover:bg-muted-foreground/10"
+                      onClick={resetColors}
+                      title="Reset colors to defaults"
+                      type="button"
+                    >
+                      <RotateCcw className="h-2.5 w-2.5" />
+                    </button>
+                  </div>
+                </div>
+
                 <div className="flex items-center gap-2 text-muted-foreground text-xs">
                   <span className="w-12 shrink-0">Play</span>
                   <div className="flex flex-1 overflow-hidden rounded-full bg-muted">

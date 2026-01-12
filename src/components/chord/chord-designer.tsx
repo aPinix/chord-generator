@@ -246,11 +246,11 @@ export function ChordDesigner() {
             />
 
             {/* Legend & Controls Info */}
-            <div className="flex flex-col gap-4 rounded-2xl bg-background/60 p-4 dark:bg-zinc-800/40">
+            <div className="flex flex-col gap-4 rounded-2xl bg-background p-4 dark:bg-zinc-800/40">
               {/* Finger Legend */}
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
                 <span className="font-medium text-muted-foreground text-xs uppercase tracking-wide">
-                  Fingers:
+                  Fingers
                 </span>
                 <div className="flex flex-wrap items-center gap-2">
                   <div className="flex items-center gap-1.5">
@@ -292,7 +292,7 @@ export function ChordDesigner() {
               <div className="flex flex-wrap gap-x-8 gap-y-3 border-muted border-t pt-4 text-sm">
                 <div className="flex items-center gap-3">
                   <span className="font-medium text-muted-foreground text-xs uppercase tracking-wide">
-                    Mouse:
+                    Mouse
                   </span>
                   <span className="text-muted-foreground">
                     <kbd className="rounded-full bg-muted px-2 py-1 font-mono font-semibold text-xs">
@@ -314,7 +314,7 @@ export function ChordDesigner() {
               <div className="flex flex-wrap gap-x-8 gap-y-3 border-muted border-t pt-4 text-sm">
                 <div className="flex items-center gap-3">
                   <span className="font-medium text-muted-foreground text-xs uppercase tracking-wide">
-                    History:
+                    History
                   </span>
                   <span className="text-muted-foreground">
                     <kbd className="rounded-full bg-muted px-2 py-1 font-mono font-semibold text-xs">
