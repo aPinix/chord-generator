@@ -15,7 +15,7 @@ const socialLinks = [
   },
   {
     name: 'LinkedIn',
-    href: 'https://linkedin.com/in/aPinix',
+    href: 'https://linkedin.com/in/pinix',
     icon: Linkedin,
   },
 ];

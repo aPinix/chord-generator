@@ -60,16 +60,19 @@ export const ChordSearchInput = ({
           <InputGroupAddon align="inline-end">
             <AndDialog
               description="Browse all chords in the library"
-              title="Chord Library"
-              trigger={
+              render={
                 <AndButton
                   shape="circle"
                   title="Browse all chords"
                   variant="basic"
-                >
+                />
+              }
+              title="Chord Library"
+              trigger={
+                <>
                   <Grid2X2 className="size-4" />
                   <span className="text-sm">Browse</span>
-                </AndButton>
+                </>
               }
             >
               <ScrollArea className="h-[calc(100vh-12rem)]">

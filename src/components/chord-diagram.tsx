@@ -1,7 +1,7 @@
 'use client';
 
 import Color from 'color';
-import { Download, RotateCcw, Volume2 } from 'lucide-react';
+import { Download, Volume2 } from 'lucide-react';
 import {
   forwardRef,
   useCallback,
@@ -26,7 +26,6 @@ import {
 import {
   GUITAR_TYPES,
   type GuitarType,
-  getGuitarType,
   playChord,
   setGuitarType,
 } from '@/lib/chord-audio';
@@ -84,7 +83,7 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
     const [downloadFormat, setDownloadFormat] = useState<DownloadFormat>('png');
     const [diagramSize, setDiagramSize] = useState<DiagramSize>('md');
     const [guitarType, setGuitarTypeState] = useState<GuitarType>(
-      getGuitarType()
+      'acoustic_guitar_nylon'
     );
     const [showFingersInternal, setShowFingersInternal] = useState(false);
     const [diagramColor, setDiagramColor] =
