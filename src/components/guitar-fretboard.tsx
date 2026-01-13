@@ -111,9 +111,9 @@ export function GuitarFretboard({
     <div className="flex flex-col gap-2">
       <div className="relative flex overflow-hidden rounded-lg">
         {/* String labels - sticky on scroll */}
-        <div className="sticky left-0 z-20 flex flex-col rounded-l-lg bg-white dark:bg-stone-900">
+        <div className="sticky left-0 z-20 flex flex-col rounded-l-lg bg-background dark:bg-stone-900">
           {/* Toggle all button + spacer to align with fret numbers row */}
-          <div className="mr-auto flex h-7 w-11 items-center justify-center rounded-tl-lg border-background border-r-4 bg-background">
+          <div className="mr-auto flex h-7 w-10 items-center justify-center rounded-tl-lg border-background">
             <button
               className={cn(
                 'flex size-4 cursor-pointer touch-manipulation items-center justify-center rounded-full font-bold text-[10px] transition-all',

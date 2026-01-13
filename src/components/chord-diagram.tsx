@@ -11,6 +11,11 @@ import {
   useState,
 } from 'react';
 import { Button } from '@/components/ui/button';
+import { ButtonColorsSettings } from '@/components/ui/button-colors-settings';
+import {
+  ButtonGroupSettings,
+  ButtonGroupSettingsItem,
+} from '@/components/ui/button-group-settings';
 import {
   Select,
   SelectContent,
@@ -27,7 +32,7 @@ import {
 } from '@/lib/chord-audio';
 import type { StringState } from '@/types/chord';
 import { STRING_NAMES_LOW_TO_HIGH } from '@/types/chord';
-import { AndImage } from '../and/and-image';
+import { AndImage } from './and/and-image';
 
 interface ChordDiagramProps {
   strings: StringState[];
@@ -801,73 +806,61 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
                 Options
               </span>
               <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2 text-muted-foreground text-xs">
-                  <span className="w-12 shrink-0">Size</span>
-                  <div className="flex flex-1 overflow-hidden rounded-full bg-muted">
-                    {(['xs', 'sm', 'md', 'lg', 'xl'] as DiagramSize[]).map(
-                      (s) => (
-                        <button
-                          className={`flex-1 cursor-pointer px-2 py-1.5 text-xs transition-colors ${
-                            effectiveSize === s
-                              ? 'bg-primary text-primary-foreground'
-                              : 'hover:bg-muted-foreground/10'
-                          }`}
-                          key={s}
-                          onClick={() => setDiagramSize(s)}
-                          type="button"
-                        >
-                          {s.toUpperCase()}
-                        </button>
-                      )
-                    )}
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 text-muted-foreground text-xs">
-                  <span className="w-12 shrink-0">Format</span>
-                  <div className="flex flex-1 overflow-hidden rounded-full bg-muted">
-                    {(['png', 'jpg', 'svg'] as DownloadFormat[]).map((f) => (
-                      <button
-                        className={`flex-1 cursor-pointer px-2 py-1.5 text-xs transition-colors ${
-                          downloadFormat === f
-                            ? 'bg-primary text-primary-foreground'
-                            : 'hover:bg-muted-foreground/10'
-                        }`}
-                        key={f}
-                        onClick={() => setDownloadFormat(f)}
-                        type="button"
+                <ButtonGroupSettings label="Size">
+                  {(['xs', 'sm', 'md', 'lg', 'xl'] as DiagramSize[]).map(
+                    (s) => (
+                      <ButtonGroupSettingsItem
+                        isActive={effectiveSize === s}
+                        key={s}
+                        onClick={() => setDiagramSize(s)}
                       >
-                        {f.toUpperCase()}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 text-muted-foreground text-xs">
-                  <span className="w-12 shrink-0">Fingers</span>
-                  <div className="flex flex-1 overflow-hidden rounded-full bg-muted">
-                    <button
-                      className={`flex-1 cursor-pointer px-2 py-1.5 text-xs transition-colors ${
-                        showFingers
-                          ? 'bg-primary text-primary-foreground'
-                          : 'hover:bg-muted-foreground/10'
-                      }`}
-                      onClick={() => setShowFingers(true)}
-                      type="button"
+                        {s.toUpperCase()}
+                      </ButtonGroupSettingsItem>
+                    )
+                  )}
+                </ButtonGroupSettings>
+                <ButtonGroupSettings label="Format">
+                  {(['png', 'jpg', 'svg'] as DownloadFormat[]).map((f) => (
+                    <ButtonGroupSettingsItem
+                      isActive={downloadFormat === f}
+                      key={f}
+                      onClick={() => setDownloadFormat(f)}
                     >
-                      Show
-                    </button>
-                    <button
-                      className={`flex-1 cursor-pointer px-2 py-1.5 text-xs transition-colors ${
-                        !showFingers
-                          ? 'bg-primary text-primary-foreground'
-                          : 'hover:bg-muted-foreground/10'
-                      }`}
-                      onClick={() => setShowFingers(false)}
-                      type="button"
-                    >
-                      Hide
-                    </button>
-                  </div>
-                </div>
+                      {f.toUpperCase()}
+                    </ButtonGroupSettingsItem>
+                  ))}
+                </ButtonGroupSettings>
+                <ButtonGroupSettings label="Fingers">
+                  <ButtonGroupSettingsItem
+                    isActive={showFingers}
+                    onClick={() => setShowFingers(true)}
+                  >
+                    Show
+                  </ButtonGroupSettingsItem>
+                  <ButtonGroupSettingsItem
+                    isActive={!showFingers}
+                    onClick={() => setShowFingers(false)}
+                  >
+                    Hide
+                  </ButtonGroupSettingsItem>
+                </ButtonGroupSettings>
+                <ButtonColorsSettings
+                  backgroundColor={parseColorWithAlpha(backgroundColor).hex}
+                  diagramColor={parseColorWithAlpha(diagramColor).hex}
+                  label="Colors"
+                  onBackgroundColorChange={(color) => {
+                    const current = parseColorWithAlpha(backgroundColor);
+                    const newColor = Color(color).alpha(current.alpha / 100);
+                    setBackgroundColor(newColor.hex());
+                  }}
+                  onDiagramColorChange={(color) => {
+                    const current = parseColorWithAlpha(diagramColor);
+                    const newColor = Color(color).alpha(current.alpha / 100);
+                    setDiagramColor(newColor.hex());
+                  }}
+                  onResetColors={resetColors}
+                />
+
                 <div className="flex items-center gap-2 text-muted-foreground text-xs">
                   <span className="w-12 shrink-0">Guitar</span>
                   <Select
@@ -890,118 +883,31 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="flex items-center gap-2 text-muted-foreground text-xs">
-                  <span className="w-12 shrink-0">Colors</span>
 
-                  <div className="flex flex-1 items-center gap-1">
-                    {/* colors */}
-                    <div className="flex gap-2">
-                      <div className="flex items-center gap-1">
-                        <span className="text-xs opacity-70">BG</span>
-                        <div className="relative">
-                          <input
-                            className="absolute h-6 w-6 cursor-pointer opacity-0"
-                            onChange={(e) => {
-                              const current =
-                                parseColorWithAlpha(backgroundColor);
-                              const newColor = Color(e.target.value).alpha(
-                                current.alpha / 100
-                              );
-                              setBackgroundColor(newColor.hex());
-                            }}
-                            title="Background color"
-                            type="color"
-                            value={parseColorWithAlpha(backgroundColor).hex}
-                          />
-                          <button
-                            className="h-6 w-6 cursor-pointer appearance-none rounded-full border-2 border-border transition-colors hover:border-primary"
-                            onClick={(e) => {
-                              const input =
-                                e.currentTarget.parentElement?.querySelector(
-                                  'input'
-                                ) as HTMLInputElement;
-                              input?.click();
-                            }}
-                            style={{ backgroundColor }}
-                            type="button"
-                          />
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <span className="text-xs opacity-70">Lines</span>
-                        <div className="relative">
-                          <input
-                            className="absolute h-6 w-6 cursor-pointer opacity-0"
-                            onChange={(e) => {
-                              const current = parseColorWithAlpha(diagramColor);
-                              const newColor = Color(e.target.value).alpha(
-                                current.alpha / 100
-                              );
-                              setDiagramColor(newColor.hex());
-                            }}
-                            title="Diagram color"
-                            type="color"
-                            value={parseColorWithAlpha(diagramColor).hex}
-                          />
-                          <button
-                            className="h-6 w-6 cursor-pointer appearance-none rounded-full border-2 border-border transition-colors hover:border-primary"
-                            onClick={(e) => {
-                              const input =
-                                e.currentTarget.parentElement?.querySelector(
-                                  'input'
-                                ) as HTMLInputElement;
-                              input?.click();
-                            }}
-                            style={{ backgroundColor: diagramColor }}
-                            type="button"
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* reset button */}
-                    <button
-                      className="ml-auto cursor-pointer rounded-full bg-muted p-1 text-xs transition-colors hover:bg-muted-foreground/10"
-                      onClick={resetColors}
-                      title="Reset colors to defaults"
-                      type="button"
-                    >
-                      <RotateCcw className="h-2.5 w-2.5" />
-                    </button>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2 text-muted-foreground text-xs">
-                  <span className="w-12 shrink-0">Play</span>
-                  <div className="flex flex-1 overflow-hidden rounded-full bg-muted">
-                    <button
-                      className="flex flex-1 cursor-pointer items-center justify-center gap-1 px-2 py-1.5 text-xs transition-colors hover:bg-muted-foreground/10"
-                      onClick={() => {
-                        const audioStrings = [...strings]
-                          .reverse()
-                          .map((s) => s.fret);
-                        playChord(audioStrings, { strumSpeed: 50 });
-                      }}
-                      type="button"
-                    >
-                      <Volume2 className="h-3 w-3" />
-                      Normal
-                    </button>
-                    <button
-                      className="flex flex-1 cursor-pointer items-center justify-center gap-1 px-2 py-1.5 text-xs transition-colors hover:bg-muted-foreground/10"
-                      onClick={() => {
-                        const audioStrings = [...strings]
-                          .reverse()
-                          .map((s) => s.fret);
-                        playChord(audioStrings, { strumSpeed: 200 });
-                      }}
-                      type="button"
-                    >
-                      <Volume2 className="h-3 w-3" />
-                      Slow
-                    </button>
-                  </div>
-                </div>
+                <ButtonGroupSettings label="Play">
+                  <ButtonGroupSettingsItem
+                    onClick={() => {
+                      const audioStrings = [...strings]
+                        .reverse()
+                        .map((s) => s.fret);
+                      playChord(audioStrings, { strumSpeed: 50 });
+                    }}
+                  >
+                    <Volume2 className="h-3 w-3" />
+                    Normal
+                  </ButtonGroupSettingsItem>
+                  <ButtonGroupSettingsItem
+                    onClick={() => {
+                      const audioStrings = [...strings]
+                        .reverse()
+                        .map((s) => s.fret);
+                      playChord(audioStrings, { strumSpeed: 200 });
+                    }}
+                  >
+                    <Volume2 className="h-3 w-3" />
+                    Slow
+                  </ButtonGroupSettingsItem>
+                </ButtonGroupSettings>
               </div>
             </div>
           </div>

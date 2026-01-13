@@ -21,8 +21,8 @@ const buttonVariants = cva(
           'disabled:bg-gray-400 disabled:text-gray-50'
         ),
         basic: cn(
-          'bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700',
-          'disabled:bg-gray-400 disabled:text-gray-50'
+          'bg-background text-foreground shadow-sm',
+          'disabled:bg-transparent disabled:text-muted-foreground disabled:shadow-none'
         ),
         outline: cn(
           'border border-gray-200 bg-background hover:bg-[hsl(from_var(--uni-button-accent)_h_s_calc(l-7))] active:bg-[hsl(from_var(--uni-button-accent)_h_s_calc(l-14))]',
@@ -45,9 +45,11 @@ const buttonVariants = cva(
         sm: 'h-9 px-3',
         md: 'h-10 px-4',
         lg: 'h-11 px-8',
+        iconXs: 'h-8 w-8 p-0',
         iconSm: 'h-9 w-9 p-0',
         iconMd: 'h-10 w-10 p-0',
         iconLg: 'h-11 w-11 p-0',
+        iconXl: 'h-12 w-12 p-0',
       },
       shape: {
         circle: 'rounded-full',

@@ -1,4 +1,4 @@
-import { ChordDesigner } from '@/components/chord/chord-designer';
+import { ChordDesigner } from '@/components/chord-designer';
 import { APP_DESCRIPTION } from '@/config/variables.config';
 
 export default function Home() {
