@@ -3,21 +3,23 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 interface AndTooltipProps {
   side?: 'top' | 'right' | 'bottom' | 'left';
   trigger: React.ReactNode;
-  render?:
-    | React.ReactElement<any, string | React.JSXElementConstructor<any>>
-    | ((props: any) => React.ReactElement);
+  asChild?: boolean;
   children: React.ReactNode;
 }
 
 export const AndTooltip = ({
   side = 'top',
   trigger,
-  render,
+  asChild,
   children,
 }: AndTooltipProps) => {
   return (
     <Tooltip>
-      <TooltipTrigger render={render}>{trigger}</TooltipTrigger>
+      <TooltipTrigger
+        render={asChild ? (trigger as React.ReactElement) : undefined}
+      >
+        {trigger}
+      </TooltipTrigger>
       <TooltipContent side={side}>{children}</TooltipContent>
     </Tooltip>
   );

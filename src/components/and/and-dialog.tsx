@@ -15,9 +15,7 @@ interface AndDialogProps {
   title?: string;
   description?: string;
   trigger?: React.ReactNode;
-  render?:
-    | React.ReactElement<any, string | React.JSXElementConstructor<any>>
-    | ((props: any) => React.ReactElement);
+  asChild?: boolean;
   className?: string;
   classNameTitle?: string;
   classNameDescription?: string;
@@ -30,7 +28,7 @@ export const AndDialog = ({
   title,
   description,
   trigger,
-  render,
+  asChild,
   className,
   classNameTitle,
   classNameDescription,
@@ -48,7 +46,11 @@ export const AndDialog = ({
       }}
       open={dialogOpen}
     >
-      <DialogTrigger render={render}>{trigger}</DialogTrigger>
+      <DialogTrigger
+        render={asChild ? (trigger as React.ReactElement) : undefined}
+      >
+        {trigger}
+      </DialogTrigger>
       <DialogContent
         className={cn(
           'max-h-[calc(100dvh-4rem)]! w-screen! max-w-[calc(100vw-4rem)]! gap-0 overflow-hidden p-0',
