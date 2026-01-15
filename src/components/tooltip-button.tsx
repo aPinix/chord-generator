@@ -31,7 +31,9 @@ export const TooltipButton = ({
   return (
     <>
       {!disabled ? (
-        <AndTooltip trigger={<Button />}>{tooltipText}</AndTooltip>
+        <AndTooltip render={<Button />} trigger={<Button />}>
+          {tooltipText}
+        </AndTooltip>
       ) : (
         <Button />
       )}

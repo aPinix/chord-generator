@@ -1,6 +1,6 @@
 import { APP_NAME } from '@/config/variables.config';
-import { AndImage } from './and/and-image';
-import { ThemeModeSelector } from './theme/theme-mode-selector';
+import { AndImage } from '../and/and-image';
+import { ThemeModeSelector } from '../theme/theme-mode-selector';
 
 export const Header = () => {
   return (

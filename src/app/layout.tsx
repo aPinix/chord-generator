@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Flow_Block, Geist, Geist_Mono } from 'next/font/google';
 import Script from 'next/script';
-import { Footer } from '@/components/footer';
+import { Footer } from '@/components/layout/footer';
 import { ThemeNameScript } from '@/components/theme/theme-name-script';
 import { Providers } from '@/config/providers.config';
 import {
@@ -14,7 +14,7 @@ import {
 } from '@/config/variables.config';
 import { DEBUG_REACT_SCAN } from '@/config/variables-const.config';
 import '../styles/globals.css';
-import { Header } from '@/components/header';
+import { Header } from '@/components/layout/header';
 
 const fontPrimary = Geist({
   variable: '--font-primary',

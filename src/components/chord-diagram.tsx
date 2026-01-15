@@ -10,12 +10,12 @@ import {
   useRef,
   useState,
 } from 'react';
-import { Button } from '@/components/ui/button';
-import { ButtonColorsSettings } from '@/components/ui/button-colors-settings';
+import { ButtonColorsSettings } from '@/components/button-colors-settings';
 import {
   ButtonGroupSettings,
   ButtonGroupSettingsItem,
-} from '@/components/ui/button-group-settings';
+} from '@/components/button-group-settings';
+import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
