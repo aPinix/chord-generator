@@ -1,7 +1,8 @@
 'use client';
 
 import Color from 'color';
-import { Download, Volume2 } from 'lucide-react';
+import { Download01Icon, VolumeHighIcon } from '@hugeicons/core-free-icons';
+import { HugeiconsIcon } from '@hugeicons/react';
 import {
   forwardRef,
   useCallback,
@@ -795,7 +796,7 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
               className="h-10 w-full rounded-full"
               onClick={downloadImage}
             >
-              <Download className="mr-2 h-4 w-4" />
+              <HugeiconsIcon icon={Download01Icon} className="mr-2 h-4 w-4" />
               Download
             </Button>
 
@@ -892,7 +893,7 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
                       playChord(audioStrings, { strumSpeed: 50 });
                     }}
                   >
-                    <Volume2 className="h-3 w-3" />
+                    <HugeiconsIcon icon={VolumeHighIcon} className="h-3 w-3" />
                     Normal
                   </ButtonGroupSettingsItem>
                   <ButtonGroupSettingsItem
@@ -903,7 +904,7 @@ export const ChordDiagram = forwardRef<SVGSVGElement, ChordDiagramProps>(
                       playChord(audioStrings, { strumSpeed: 200 });
                     }}
                   >
-                    <Volume2 className="h-3 w-3" />
+                    <HugeiconsIcon icon={VolumeHighIcon} className="h-3 w-3" />
                     Slow
                   </ButtonGroupSettingsItem>
                 </ButtonGroupSettings>

@@ -1,10 +1,7 @@
 'use client';
 
-import {
-  ChevronDownIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-} from 'lucide-react';
+import { ArrowDown01Icon, ArrowLeft01Icon, ArrowRight01Icon } from '@hugeicons/core-free-icons';
+import { HugeiconsIcon } from '@hugeicons/react';
 import * as React from 'react';
 import {
   type DayButton,
@@ -81,7 +78,7 @@ function Calendar({
             : 'cn-calendar-caption-label flex items-center gap-1 rounded-(--cell-radius) text-sm [&>svg]:size-3.5 [&>svg]:text-muted-foreground',
           defaultClassNames.caption_label
         ),
-        table: 'w-full border-collapse',
+        month_grid: cn('w-full border-collapse', defaultClassNames.month_grid),
         weekdays: cn('flex', defaultClassNames.weekdays),
         weekday: cn(
           'flex-1 select-none rounded-(--cell-radius) font-normal text-[0.8rem] text-muted-foreground',
@@ -141,13 +138,14 @@ function Calendar({
         Chevron: ({ className, orientation, ...props }) => {
           if (orientation === 'left') {
             return (
-              <ChevronLeftIcon className={cn('size-4', className)} {...props} />
+              <HugeiconsIcon icon={ArrowLeft01Icon} className={cn('size-4', className)} {...props} />
             );
           }
 
           if (orientation === 'right') {
             return (
-              <ChevronRightIcon
+              <HugeiconsIcon
+                icon={ArrowRight01Icon}
                 className={cn('size-4', className)}
                 {...props}
               />
@@ -155,7 +153,7 @@ function Calendar({
           }
 
           return (
-            <ChevronDownIcon className={cn('size-4', className)} {...props} />
+            <HugeiconsIcon icon={ArrowDown01Icon} className={cn('size-4', className)} {...props} />
           );
         },
         DayButton: CalendarDayButton,

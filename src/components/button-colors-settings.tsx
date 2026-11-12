@@ -1,4 +1,5 @@
-import { RotateCcw } from 'lucide-react';
+import { RotateLeft01Icon } from '@hugeicons/core-free-icons';
+import { HugeiconsIcon } from '@hugeicons/react';
 import { cn } from '@/lib/utils';
 
 interface ButtonColorsSettingsProps {
@@ -89,7 +90,7 @@ export function ButtonColorsSettings({
           title="Reset colors to defaults"
           type="button"
         >
-          <RotateCcw className="h-2.5 w-2.5" />
+          <HugeiconsIcon icon={RotateLeft01Icon} className="h-2.5 w-2.5" />
         </button>
       </div>
     </div>

@@ -1,6 +1,7 @@
 'use client';
 
-import { Grid2X2, Search } from 'lucide-react';
+import { GridViewIcon, Search01Icon } from '@hugeicons/core-free-icons';
+import { HugeiconsIcon } from '@hugeicons/react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   formatChordName as formatName,
@@ -50,7 +51,8 @@ export const ChordSearchInput = ({
             value={searchQuery}
           />
           <InputGroupAddon className="ml-2 px-2">
-            <Search
+            <HugeiconsIcon
+              icon={Search01Icon}
               className={cn(
                 'size-4 text-muted-foreground',
                 loading && 'animate-pulse'
@@ -68,7 +70,7 @@ export const ChordSearchInput = ({
                   title="Browse all chords"
                   variant="basic"
                 >
-                  <Grid2X2 className="size-4" />
+                  <HugeiconsIcon icon={GridViewIcon} className="size-4" />
                   <span className="text-sm">Browse</span>
                 </AndButton>
               }

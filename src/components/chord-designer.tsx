@@ -1,6 +1,7 @@
 'use client';
 
-import { Redo2, RotateCcw, Undo2 } from 'lucide-react';
+import { Redo03Icon, RotateLeft01Icon, Undo03Icon } from '@hugeicons/core-free-icons';
+import { HugeiconsIcon } from '@hugeicons/react';
 import { useCallback, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -180,7 +181,7 @@ export function ChordDesigner() {
                 onClick={canUndo ? undo : undefined}
                 tooltipText="Undo (Ctrl+Z)"
               >
-                <Undo2 className="size-5" />
+                <HugeiconsIcon icon={Undo03Icon} className="size-5" />
               </TooltipButton>
 
               {/* redo */}
@@ -189,7 +190,7 @@ export function ChordDesigner() {
                 onClick={canRedo ? redo : undefined}
                 tooltipText="Redo (Ctrl+Shift+Z)"
               >
-                <Redo2 className="size-5" />
+                <HugeiconsIcon icon={Redo03Icon} className="size-5" />
               </TooltipButton>
 
               {/* reset */}
@@ -198,7 +199,7 @@ export function ChordDesigner() {
                 onClick={handleReset}
                 tooltipText="Reset"
               >
-                <RotateCcw className="size-5" />
+                <HugeiconsIcon icon={RotateLeft01Icon} className="size-5" />
               </TooltipButton>
             </div>
           }

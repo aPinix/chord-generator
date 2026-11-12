@@ -1,4 +1,5 @@
-import { Github, Linkedin, Twitter } from 'lucide-react';
+import { GithubIcon, Linkedin01Icon, NewTwitterIcon } from '@hugeicons/core-free-icons';
+import { HugeiconsIcon } from '@hugeicons/react';
 import Link from 'next/link';
 import { APP_NAME } from '@/config/variables.config';
 
@@ -6,17 +7,17 @@ const socialLinks = [
   {
     name: 'Twitter',
     href: 'https://twitter.com/aPinix',
-    icon: Twitter,
+    icon: NewTwitterIcon,
   },
   {
     name: 'GitHub',
     href: 'https://github.com/aPinix',
-    icon: Github,
+    icon: GithubIcon,
   },
   {
     name: 'LinkedIn',
     href: 'https://linkedin.com/in/pinix',
-    icon: Linkedin,
+    icon: Linkedin01Icon,
   },
 ];
 
@@ -31,7 +32,7 @@ export function Footer() {
             <p className="text-muted-foreground text-sm">
               © {currentYear} {APP_NAME}. Built by{' '}
               <Link
-                className="font-medium text-foreground underline-offset-4 transition-colors hover:underline"
+                className="text-foreground font-medium underline-offset-4 transition-colors hover:underline"
                 href="https://github.com/aPinix"
                 rel="noopener noreferrer"
                 target="_blank"
@@ -45,13 +46,13 @@ export function Footer() {
             {socialLinks.map((link) => (
               <Link
                 aria-label={link.name}
-                className="text-muted-foreground transition-colors hover:text-foreground"
+                className="text-muted-foreground hover:text-foreground transition-colors"
                 href={link.href}
                 key={link.name}
                 rel="noopener noreferrer"
                 target="_blank"
               >
-                <link.icon className="size-5" />
+                <HugeiconsIcon className="size-5" icon={link.icon} />
               </Link>
             ))}
           </div>

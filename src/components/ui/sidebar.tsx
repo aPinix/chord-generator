@@ -3,7 +3,8 @@
 import { mergeProps } from '@base-ui/react/merge-props';
 import { useRender } from '@base-ui/react/use-render';
 import { cva, type VariantProps } from 'class-variance-authority';
-import { PanelLeftIcon } from 'lucide-react';
+import { SidebarLeftIcon } from '@hugeicons/core-free-icons';
+import { HugeiconsIcon } from '@hugeicons/react';
 import * as React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -273,7 +274,7 @@ function SidebarTrigger({
       variant="ghost"
       {...props}
     >
-      <PanelLeftIcon />
+      <HugeiconsIcon icon={SidebarLeftIcon} />
       <span className="sr-only">Toggle Sidebar</span>
     </Button>
   );

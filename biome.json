@@ -7,60 +7,94 @@
   },
   "files": {
     "ignoreUnknown": true,
-    "includes": ["**", "!node_modules", "!.history", "!.next", "!dist", "!build"]
+    "includes": [
+      "**",
+      "!node_modules",
+      "!.history",
+      "!.output",
+      "!.wxt",
+      "!!marketing",
+      "!components/ui"
+    ]
   },
   "formatter": {
     "enabled": true,
     "indentStyle": "space",
     "indentWidth": 2,
     "lineEnding": "lf",
-    "lineWidth": 80
+    "lineWidth": 80,
+    "bracketSpacing": true,
+    "bracketSameLine": false
   },
   "javascript": {
     "formatter": {
       "quoteStyle": "single",
       "jsxQuoteStyle": "double",
-      "trailingCommas": "es5"
+      "trailingCommas": "es5",
+      "semicolons": "always",
+      "arrowParentheses": "always"
+    }
+  },
+  "json": {
+    "formatter": {
+      "trailingCommas": "none"
     }
   },
   "css": {
     "parser": {
-      "allowWrongLineComments": false,
-      "cssModules": false,
       "tailwindDirectives": true
     },
     "formatter": {
       "quoteStyle": "single"
     }
   },
+  "tailwind": {
+    "stylesheet": "./styles/globals.css",
+    "attributes": [
+      "class",
+      "className",
+      "thumbClassName",
+      "trackClassName",
+      "titleClassName",
+      "tw"
+    ],
+    "mergeFunctions": ["cn", "clsx", "tw"],
+    "variantFunctions": ["cva", "tv"]
+  },
+  "html": {
+    "formatter": {
+      "enabled": true
+    }
+  },
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true,
-			"correctness": {
+      "preset": "recommended",
+      "correctness": {
+        "noUnusedImports": "error",
         "noUnusedVariables": "error"
       },
+      "suspicious": {
+        "noArrayIndexKey": "off"
+      },
       "nursery": {
-        "useSortedClasses": {
+        "useTailwindSortedClasses": {
           "level": "error",
-          "fix": "safe",
-          "options": {
-            "attributes": ["class"],
-            "functions": ["cn"]
-          }
+          "fix": "safe"
         }
       }
     },
     "domains": {
-      "next": "recommended",
-      "react": "recommended"
+      "react": "recommended",
+      "tailwind": "recommended",
+      "test": "recommended"
     }
   },
   "assist": {
     "actions": {
       "source": {
         "organizeImports": "on",
-				"useSortedAttributes": "on"
+        "useSortedAttributes": "on"
       }
     }
   }

@@ -1,6 +1,7 @@
 'use client';
 
-import { MonitorIcon, MoonIcon, SunIcon } from 'lucide-react';
+import { ComputerIcon, Moon02Icon, Sun03Icon } from '@hugeicons/core-free-icons';
+import { HugeiconsIcon } from '@hugeicons/react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useTheme } from 'next-themes';
 import { useCallback } from 'react';
@@ -65,13 +66,13 @@ export const ThemeModeSelector: React.FC<ThemeModeSelectorPropsT> = ({
       const themeMode = mode || theme;
       switch (themeMode) {
         case ThemeModeE.Light:
-          return <SunIcon className="h-4 w-4" />;
+          return <HugeiconsIcon icon={Sun03Icon} className="h-4 w-4" />;
         case ThemeModeE.Dark:
-          return <MoonIcon className="h-4 w-4" />;
+          return <HugeiconsIcon icon={Moon02Icon} className="h-4 w-4" />;
         case ThemeModeE.System:
-          return <MonitorIcon className="h-4 w-4" />;
+          return <HugeiconsIcon icon={ComputerIcon} className="h-4 w-4" />;
         default:
-          return <SunIcon className="h-4 w-4" />;
+          return <HugeiconsIcon icon={Sun03Icon} className="h-4 w-4" />;
       }
     },
     [theme]
