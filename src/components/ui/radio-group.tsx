@@ -2,8 +2,7 @@
 
 import { Radio as RadioPrimitive } from '@base-ui/react/radio';
 import { RadioGroup as RadioGroupPrimitive } from '@base-ui/react/radio-group';
-import { CircleIcon } from '@hugeicons/core-free-icons';
-import { HugeiconsIcon } from '@hugeicons/react';
+import { CircleIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 function RadioGroup({ className, ...props }: RadioGroupPrimitive.Props) {
@@ -30,7 +29,7 @@ function RadioGroupItem({ className, ...props }: RadioPrimitive.Root.Props) {
         className="flex size-4 items-center justify-center text-primary group-aria-invalid/radio-group-item:text-destructive"
         data-slot="radio-group-indicator"
       >
-        <HugeiconsIcon icon={CircleIcon} className="absolute top-1/2 left-1/2 size-2 -translate-x-1/2 -translate-y-1/2 fill-current" />
+        <CircleIcon className="absolute top-1/2 left-1/2 size-2 -translate-x-1/2 -translate-y-1/2 fill-current" />
       </RadioPrimitive.Indicator>
     </RadioPrimitive.Root>
   );

@@ -20,6 +20,14 @@ export interface StringState {
   finger?: number;
 }
 
+/** A chord kept in the saved-chords strip */
+export interface SavedChord {
+  id: string;
+  name: string;
+  /** High string first, like the fretboard */
+  strings: StringState[];
+}
+
 export type GuitarStrings = [
   StringState,
   StringState,

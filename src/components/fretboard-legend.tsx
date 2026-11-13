@@ -1,159 +1,86 @@
-import React from 'react';
+import { Kbd } from '@/components/ui/kbd';
 import { cn } from '@/lib/utils';
+
+const FINGERS = [
+  { finger: 1, name: 'Index' },
+  { finger: 2, name: 'Middle' },
+  { finger: 3, name: 'Ring' },
+  { finger: 4, name: 'Pinky' },
+  { finger: undefined, name: 'Any finger' },
+] as const;
+
+const SHORTCUTS = [
+  { keys: 'Space', action: 'Strum' },
+  { keys: '1–9', action: 'Saved chords' },
+  { keys: '⌘F', action: 'Find a chord' },
+  { keys: '⌘K', action: 'Browse' },
+  { keys: '⌘Z', action: 'Undo' },
+  { keys: '⌘⇧Z', action: 'Redo' },
+] as const;
+
+// What each press does on the fretboard
+const HINTS = [
+  { action: 'a fret', result: 'to add a finger' },
+  { action: 'it again', result: 'to choose the finger' },
+  { action: 'a circle', result: 'to mute or open a string' },
+] as const;
+
+/** "Tap" on touch screens, "Click" with a mouse. */
+const Press = () => (
+  <>
+    <span className="pointer-coarse:hidden">Click</span>
+    <span className="hidden pointer-coarse:inline">Tap</span>
+  </>
+);
 
 interface FretboardLegendProps {
   className?: string;
-  children: React.ReactNode;
 }
 
-export const FretboardLegend = ({
-  className,
-  children,
-}: FretboardLegendProps) => {
+export const FretboardLegend = ({ className }: FretboardLegendProps) => {
   return (
     <div
-      className={cn(
-        'flex flex-col gap-4 rounded-2xl bg-background p-4 dark:bg-zinc-800/40',
-        className
-      )}
+      className={cn('flex flex-col gap-3 text-sm text-stage-muted', className)}
     >
-      {children}
-    </div>
-  );
-};
+      <ul className="flex flex-wrap gap-x-5 gap-y-1 text-[0.8125rem]">
+        {HINTS.map(({ action, result }) => (
+          <li key={result}>
+            <span className="font-medium text-stage-foreground">
+              <Press /> {action}
+            </span>{' '}
+            {result}
+          </li>
+        ))}
+      </ul>
 
-interface FretboardLegendRowProps {
-  title: string;
-  children: React.ReactNode;
-}
+      <div className="flex flex-wrap items-center justify-between gap-x-8 gap-y-3">
+        <ul className="flex flex-wrap items-center gap-x-4 gap-y-2">
+          {FINGERS.map(({ finger, name }) => (
+            <li className="flex items-center gap-1.5" key={name}>
+              <span
+                className="finger-dot flex size-5 items-center justify-center rounded-full text-xs font-bold"
+                data-finger={finger}
+                data-flat=""
+              >
+                {finger}
+              </span>
+              {name}
+            </li>
+          ))}
+        </ul>
 
-export const FretboardLegendRow = ({
-  title,
-  children,
-}: FretboardLegendRowProps) => {
-  return (
-    <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-      {/* title */}
-      <span className="font-medium text-muted-foreground text-xs uppercase tracking-wide">
-        {title}
-      </span>
-
-      {/* content */}
-      <div className="flex flex-wrap items-center gap-2">
-        <FretboardLegendKbdWrapper>{children}</FretboardLegendKbdWrapper>
+        {/* Keyboard shortcuts are no use on a phone */}
+        <ul className="flex flex-wrap items-center gap-x-4 gap-y-2 max-md:hidden pointer-coarse:hidden">
+          {SHORTCUTS.map(({ keys, action }) => (
+            <li className="flex items-center gap-1.5" key={action}>
+              <Kbd className="bg-stage-raised/70 text-stage-foreground">
+                {keys}
+              </Kbd>
+              {action}
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
-  );
-};
-
-export const FretboardLegendFingerItemColorE = {
-  None: 'none',
-  Index: 'index',
-  Middle: 'middle',
-  Ring: 'ring',
-  Pinky: 'pinky',
-} as const;
-type FretboardLegendFingerItemColorT =
-  (typeof FretboardLegendFingerItemColorE)[keyof typeof FretboardLegendFingerItemColorE];
-
-interface FretboardLegendFingerItemProps {
-  finger: FretboardLegendFingerItemColorT;
-}
-
-export const FretboardLegendFingerItem = ({
-  finger,
-}: FretboardLegendFingerItemProps) => {
-  const getFingerClassName = (finger: FretboardLegendFingerItemColorT) => {
-    const defaultColor = 'bg-orange-500';
-
-    switch (finger) {
-      case FretboardLegendFingerItemColorE.None:
-        return defaultColor;
-      case FretboardLegendFingerItemColorE.Index:
-        return 'bg-sky-500';
-      case FretboardLegendFingerItemColorE.Middle:
-        return 'bg-lime-500';
-      case FretboardLegendFingerItemColorE.Ring:
-        return 'bg-amber-500';
-      case FretboardLegendFingerItemColorE.Pinky:
-        return 'bg-pink-500';
-      default:
-        return defaultColor;
-    }
-  };
-
-  const getFingerLabel = (finger: FretboardLegendFingerItemColorT) => {
-    switch (finger) {
-      case FretboardLegendFingerItemColorE.None:
-        return '•';
-      case FretboardLegendFingerItemColorE.Index:
-        return '1';
-      case FretboardLegendFingerItemColorE.Middle:
-        return '2';
-      case FretboardLegendFingerItemColorE.Ring:
-        return '3';
-      case FretboardLegendFingerItemColorE.Pinky:
-        return '4';
-      default:
-        return '-';
-    }
-  };
-
-  return (
-    <div className="flex items-center gap-1.5">
-      <div
-        className={cn(
-          'flex size-5 items-center justify-center rounded-full font-bold text-[10px] text-white shadow-sm',
-          getFingerClassName(finger)
-        )}
-      >
-        {getFingerLabel(finger)}
-      </div>
-      <span className="text-muted-foreground text-xs">{finger}</span>
-    </div>
-  );
-};
-
-interface FretboardLegendKbdWrapperProps {
-  children: React.ReactNode;
-}
-
-export const FretboardLegendKbdWrapper = ({
-  children,
-}: FretboardLegendKbdWrapperProps) => {
-  const childrenArray = React.Children.toArray(children);
-
-  return (
-    <div className="flex flex-wrap items-center gap-1.5">
-      {childrenArray.map((child, index) => (
-        <React.Fragment
-          key={`child-${index}-${typeof child === 'string' ? child : 'element'}`}
-        >
-          {child}
-          {index < childrenArray.length - 1 && (
-            <span className="mx-0.5 text-muted-foreground/50"></span>
-          )}
-        </React.Fragment>
-      ))}
-    </div>
-  );
-};
-
-interface FretboardLegendKbdItemProps {
-  label: string;
-  children: React.ReactNode;
-}
-
-export const FretboardLegendKbdItem = ({
-  label,
-  children,
-}: FretboardLegendKbdItemProps) => {
-  return (
-    <span className="flex items-center gap-1.5 text-muted-foreground">
-      <kbd className="rounded-lg bg-muted px-2 py-1 font-mono font-semibold text-xs">
-        {children}
-      </kbd>
-      <span className="text-xs">{label}</span>
-    </span>
   );
 };

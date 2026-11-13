@@ -1,7 +1,6 @@
 'use client';
 
-import { ComputerIcon, Moon02Icon, Sun03Icon } from '@hugeicons/core-free-icons';
-import { HugeiconsIcon } from '@hugeicons/react';
+import { MonitorIcon, MoonIcon, SunIcon } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useTheme } from 'next-themes';
 import { useCallback } from 'react';
@@ -66,13 +65,13 @@ export const ThemeModeSelector: React.FC<ThemeModeSelectorPropsT> = ({
       const themeMode = mode || theme;
       switch (themeMode) {
         case ThemeModeE.Light:
-          return <HugeiconsIcon icon={Sun03Icon} className="h-4 w-4" />;
+          return <SunIcon className="h-4 w-4" />;
         case ThemeModeE.Dark:
-          return <HugeiconsIcon icon={Moon02Icon} className="h-4 w-4" />;
+          return <MoonIcon className="h-4 w-4" />;
         case ThemeModeE.System:
-          return <HugeiconsIcon icon={ComputerIcon} className="h-4 w-4" />;
+          return <MonitorIcon className="h-4 w-4" />;
         default:
-          return <HugeiconsIcon icon={Sun03Icon} className="h-4 w-4" />;
+          return <SunIcon className="h-4 w-4" />;
       }
     },
     [theme]
@@ -99,17 +98,21 @@ export const ThemeModeSelector: React.FC<ThemeModeSelectorPropsT> = ({
       )}
 
       {variant === ThemeModeSelectorVariantE.ButtonGroup && (
+        // Outlined like the header's other pills; the chosen theme is filled
+        // like the Strum button
         <ToggleGroup
+          className="gap-0.5 rounded-full p-0.5 shadow-none ring-1 ring-stage-edge"
           onValueChange={(value) => {
             const nextValue = value?.[0];
             if (nextValue) setTheme(nextValue);
           }}
+          spacing={0.5}
           value={theme ? [theme] : undefined}
-          variant="outline"
         >
           {modes.map((mode) => (
             <ToggleGroupItem
-              aria-label={`Toggle ${mode}`}
+              aria-label={`${getThemeLabel(mode)} theme`}
+              className="size-8 min-w-8 rounded-full px-0 text-stage-foreground transition-colors hover:bg-stage-raised/60 hover:text-stage-foreground focus-visible:ring-2 focus-visible:ring-stage-foreground aria-pressed:bg-stage-foreground aria-pressed:text-stage aria-pressed:hover:bg-stage-foreground aria-pressed:hover:text-stage pointer-coarse:size-10"
               key={mode}
               value={mode}
             >

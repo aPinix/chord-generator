@@ -6,7 +6,7 @@ import { Spinner } from '../ui/spinner';
 
 const buttonVariants = cva(
   cn(
-    "inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium text-sm outline-none transition-all focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+    "inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
     'active:scale-97'
   ),
   {
@@ -29,15 +29,15 @@ const buttonVariants = cva(
           'disabled:border-gray-400 disabled:text-gray-50'
         ),
         ghost: cn(
-          'text-foreground hover:bg-[hsl(from_var(--color-accent)_h_s_calc(l-7))] hover:bg-accent active:bg-[hsl(from_var(--color-accent)_h_s_calc(l-14))]',
+          'text-foreground hover:bg-accent hover:bg-[hsl(from_var(--color-accent)_h_s_calc(l-7))] active:bg-[hsl(from_var(--color-accent)_h_s_calc(l-14))]',
           'disabled:text-gray-50'
         ),
         tab: cn(
-          'rounded-b-none border-foreground border-b-2 hover:bg-[hsl(from_var(--color-accent)_h_s_calc(l-7))] hover:text-foreground active:bg-[hsl(from_var(--color-accent)_h_s_calc(l-14))]',
+          'rounded-b-none border-b-2 border-foreground hover:bg-[hsl(from_var(--color-accent)_h_s_calc(l-7))] hover:text-foreground active:bg-[hsl(from_var(--color-accent)_h_s_calc(l-14))]',
           'disabled:text-gray-50'
         ),
         link: cn(
-          'h-auto rounded-none p-0 text-brand-1 underline underline-offset-4 hover:text-[hsl(from_var(--color-brand-1)_h_s_calc(l-7))] active:text-[hsl(from_var(--color-brand-1)_h_s_calc(l-14))]',
+          'text-brand-1 h-auto rounded-none p-0 underline underline-offset-4 hover:text-[hsl(from_var(--color-brand-1)_h_s_calc(l-7))] active:text-[hsl(from_var(--color-brand-1)_h_s_calc(l-14))]',
           'disabled:text-gray-50'
         ),
       },

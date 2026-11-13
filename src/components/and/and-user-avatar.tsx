@@ -44,7 +44,7 @@ export const AndUserAvatar: React.FC<AndUserAvatarPropsI> = ({
           {title && (
             <span
               className={cn(
-                'truncate font-medium text-foreground text-sm',
+                'truncate text-sm font-medium text-foreground',
                 classNameTitle
               )}
             >
@@ -54,7 +54,7 @@ export const AndUserAvatar: React.FC<AndUserAvatarPropsI> = ({
           {description && (
             <span
               className={cn(
-                'truncate text-muted-foreground text-xs',
+                'truncate text-xs text-muted-foreground',
                 classNameDescription
               )}
             >

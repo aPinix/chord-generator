@@ -58,7 +58,7 @@ export const AndDialog = ({
         )}
       >
         <DialogHeader
-          className={cn('border-border border-b px-6 py-6', classNameHeader)}
+          className={cn('border-b border-border px-6 py-6', classNameHeader)}
         >
           {title && (
             <DialogTitle className={cn('text-2xl', classNameTitle)}>

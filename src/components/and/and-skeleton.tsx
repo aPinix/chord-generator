@@ -4,7 +4,7 @@ import { isValidElement } from 'react';
 import { cn } from '@/lib/utils';
 
 const SKELETON_CLASS_TEXT = cn(
-  '**:letter-spacing-[-0.1rem] pointer-events-none animate-pulse select-none font-normal! font-skeleton! text-(--skeleton-foreground)! **:text-[currentColor]'
+  '**:letter-spacing-[-0.1rem] font-skeleton! pointer-events-none animate-pulse font-normal! text-(--skeleton-foreground)! select-none **:text-[currentColor]'
 );
 const SKELETON_CLASS_BLOCK = cn(
   'relative border-0! bg-(--skeleton-background) after:absolute after:inset-0 after:rounded-[inherit] after:bg-inherit after:content-[""]'

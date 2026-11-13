@@ -1,8 +1,10 @@
-import type { Metadata } from 'next';
-import { Flow_Block, Geist, Geist_Mono } from 'next/font/google';
+import type { Metadata, Viewport } from 'next';
+import { Flow_Block, Geist_Mono, Inter } from 'next/font/google';
 import Script from 'next/script';
 import { Footer } from '@/components/layout/footer';
+import { ThemeColorMeta } from '@/components/theme/theme-color-meta';
 import { ThemeNameScript } from '@/components/theme/theme-name-script';
+import { Toaster } from '@/components/ui/sonner';
 import { Providers } from '@/config/providers.config';
 import {
   APP_DESCRIPTION,
@@ -16,13 +18,15 @@ import { DEBUG_REACT_SCAN } from '@/config/variables-const.config';
 import '../styles/globals.css';
 import { Header } from '@/components/layout/header';
 
-const fontPrimary = Geist({
-  variable: '--font-primary',
+// One family for the interface and the headings. To give headings their own
+// face, load it here with `variable: '--font-family-display'`.
+const fontSans = Inter({
+  variable: '--font-family-sans',
   subsets: ['latin'],
 });
 
 const fontMono = Geist_Mono({
-  variable: '--font-mono',
+  variable: '--font-family-mono',
   subsets: ['latin'],
 });
 
@@ -74,6 +78,11 @@ export const metadata: Metadata = {
   },
 };
 
+// Matches the stage; ThemeColorMeta keeps it in step with the theme toggle
+export const viewport: Viewport = {
+  themeColor: '#c3e5d7',
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -92,15 +101,17 @@ export default function RootLayout({
         )}
       </head>
       <body
-        className={`${fontPrimary.variable} ${fontMono.variable} ${fontSkeleton.variable} flex min-h-screen flex-col antialiased`}
+        className={`${fontSans.variable} ${fontMono.variable} ${fontSkeleton.variable} flex min-h-screen flex-col antialiased`}
         suppressHydrationWarning
       >
         <Providers>
+          <ThemeColorMeta />
           <Header />
           <main className="flex flex-1 flex-col overflow-x-clip">
             {children}
           </main>
           <Footer />
+          <Toaster position="bottom-center" />
         </Providers>
       </body>
     </html>

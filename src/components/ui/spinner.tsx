@@ -1,14 +1,9 @@
-import { Loading03Icon } from '@hugeicons/core-free-icons';
-import { HugeiconsIcon, type HugeiconsIconProps } from '@hugeicons/react';
+import { LoaderCircleIcon, type LucideProps } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-function Spinner({
-  className,
-  ...props
-}: Omit<HugeiconsIconProps, 'icon'>) {
+function Spinner({ className, ...props }: LucideProps) {
   return (
-    <HugeiconsIcon
-      icon={Loading03Icon}
+    <LoaderCircleIcon
       aria-label="Loading"
       className={cn('size-4 animate-spin', className)}
       role="status"

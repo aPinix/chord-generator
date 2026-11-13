@@ -51,15 +51,15 @@ function FieldGroup({ className, ...props }: React.ComponentProps<'div'>) {
 }
 
 const fieldVariants = cva(
-  'data-[invalid=true]:text-destructive gap-3 group/field flex w-full',
+  'group/field flex w-full gap-3 data-[invalid=true]:text-destructive',
   {
     variants: {
       orientation: {
         vertical: 'flex-col [&>*]:w-full [&>.sr-only]:w-auto',
         horizontal:
-          'flex-row items-center [&>[data-slot=field-label]]:flex-auto has-[>[data-slot=field-content]]:items-start has-[>[data-slot=field-content]]:[&>[role=checkbox],[role=radio]]:mt-px',
+          'flex-row items-center has-[>[data-slot=field-content]]:items-start [&>[data-slot=field-label]]:flex-auto has-[>[data-slot=field-content]]:[&>[role=checkbox],[role=radio]]:mt-px',
         responsive:
-          'flex-col [&>*]:w-full [&>.sr-only]:w-auto @md/field-group:flex-row @md/field-group:items-center @md/field-group:[&>*]:w-auto @md/field-group:[&>[data-slot=field-label]]:flex-auto @md/field-group:has-[>[data-slot=field-content]]:items-start @md/field-group:has-[>[data-slot=field-content]]:[&>[role=checkbox],[role=radio]]:mt-px',
+          'flex-col @md/field-group:flex-row @md/field-group:items-center @md/field-group:has-[>[data-slot=field-content]]:items-start [&>*]:w-full @md/field-group:[&>*]:w-auto [&>.sr-only]:w-auto @md/field-group:[&>[data-slot=field-label]]:flex-auto @md/field-group:has-[>[data-slot=field-content]]:[&>[role=checkbox],[role=radio]]:mt-px',
       },
     },
     defaultVariants: {
@@ -105,7 +105,7 @@ function FieldLabel({
   return (
     <Label
       className={cn(
-        'group/field-label peer/field-label flex w-fit gap-2 leading-snug has-[>[data-slot=field]]:rounded-md has-[>[data-slot=field]]:border has-data-checked:border-primary has-data-checked:bg-primary/5 *:data-[slot=field]:p-3 group-data-[disabled=true]/field:opacity-50 dark:has-data-checked:bg-primary/10',
+        'group/field-label peer/field-label flex w-fit gap-2 leading-snug group-data-[disabled=true]/field:opacity-50 has-data-checked:border-primary has-data-checked:bg-primary/5 has-[>[data-slot=field]]:rounded-md has-[>[data-slot=field]]:border *:data-[slot=field]:p-3 dark:has-data-checked:bg-primary/10',
         'has-[>[data-slot=field]]:w-full has-[>[data-slot=field]]:flex-col',
         className
       )}
@@ -119,7 +119,7 @@ function FieldTitle({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
       className={cn(
-        'flex w-fit items-center gap-2 font-medium text-sm leading-snug group-data-[disabled=true]/field:opacity-50',
+        'flex w-fit items-center gap-2 text-sm leading-snug font-medium group-data-[disabled=true]/field:opacity-50',
         className
       )}
       data-slot="field-label"
@@ -132,9 +132,9 @@ function FieldDescription({ className, ...props }: React.ComponentProps<'p'>) {
   return (
     <p
       className={cn(
-        'text-left font-normal text-muted-foreground text-sm leading-normal group-has-data-[orientation=horizontal]/field:text-balance [[data-variant=legend]+&]:-mt-1.5',
-        'nth-last-2:-mt-1 last:mt-0',
-        '[&>a:hover]:text-primary [&>a]:underline [&>a]:underline-offset-4',
+        'text-left text-sm leading-normal font-normal text-muted-foreground group-has-data-[orientation=horizontal]/field:text-balance [[data-variant=legend]+&]:-mt-1.5',
+        'last:mt-0 nth-last-2:-mt-1',
+        '[&>a]:underline [&>a]:underline-offset-4 [&>a:hover]:text-primary',
         className
       )}
       data-slot="field-description"
@@ -216,7 +216,7 @@ function FieldError({
 
   return (
     <div
-      className={cn('font-normal text-destructive text-sm', className)}
+      className={cn('text-sm font-normal text-destructive', className)}
       data-slot="field-error"
       role="alert"
       {...props}
@@ -228,13 +228,13 @@ function FieldError({
 
 export {
   Field,
-  FieldLabel,
+  FieldContent,
   FieldDescription,
   FieldError,
   FieldGroup,
+  FieldLabel,
   FieldLegend,
   FieldSeparator,
   FieldSet,
-  FieldContent,
   FieldTitle,
 };

@@ -1,7 +1,6 @@
 import { mergeProps } from '@base-ui/react/merge-props';
 import { useRender } from '@base-ui/react/use-render';
-import { ArrowRight01Icon, MoreHorizontalIcon } from '@hugeicons/core-free-icons';
-import { HugeiconsIcon } from '@hugeicons/react';
+import { ChevronRightIcon, EllipsisIcon } from 'lucide-react';
 import type * as React from 'react';
 import { cn } from '@/lib/utils';
 
@@ -20,7 +19,7 @@ function BreadcrumbList({ className, ...props }: React.ComponentProps<'ol'>) {
   return (
     <ol
       className={cn(
-        'wrap-break-word flex flex-wrap items-center gap-1.5 text-muted-foreground text-sm sm:gap-2.5',
+        'flex flex-wrap items-center gap-1.5 text-sm wrap-break-word text-muted-foreground sm:gap-2.5',
         className
       )}
       data-slot="breadcrumb-list"
@@ -87,7 +86,7 @@ function BreadcrumbSeparator({
       role="presentation"
       {...props}
     >
-      {children ?? <HugeiconsIcon icon={ArrowRight01Icon} />}
+      {children ?? <ChevronRightIcon />}
     </li>
   );
 }
@@ -107,7 +106,7 @@ function BreadcrumbEllipsis({
       role="presentation"
       {...props}
     >
-      <HugeiconsIcon icon={MoreHorizontalIcon} />
+      <EllipsisIcon />
       <span className="sr-only">More</span>
     </span>
   );
@@ -115,10 +114,10 @@ function BreadcrumbEllipsis({
 
 export {
   Breadcrumb,
-  BreadcrumbList,
+  BreadcrumbEllipsis,
   BreadcrumbItem,
   BreadcrumbLink,
+  BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-  BreadcrumbEllipsis,
 };
