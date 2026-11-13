@@ -1,0 +1,50 @@
+name: Suggest a feature
+description: An idea that would make G-Chord better for you.
+title: "[Feature] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the idea. Tell us what you're trying to do as a player or teacher; that matters more than how it should look.
+
+  - type: textarea
+    id: need
+    attributes:
+      label: What are you trying to do?
+      description: The situation, and what gets in the way today.
+      placeholder: I print chord sheets for my students and want every diagram on one page.
+    validations:
+      required: true
+
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would help?
+      description: Your idea for how G-Chord could do it.
+      placeholder: A way to download all my saved chords as one image.
+    validations:
+      required: true
+
+  - type: textarea
+    id: workaround
+    attributes:
+      label: How do you manage today?
+      description: Any workaround, or another app you use for this.
+
+  - type: dropdown
+    id: role
+    attributes:
+      label: You use G-Chord mostly as a
+      options:
+        - Player
+        - Teacher
+        - Songwriter
+        - Student
+        - Other
+
+  - type: textarea
+    id: examples
+    attributes:
+      label: Sketches or examples
+      description: Drag in a sketch, a screenshot or a link to something similar. Optional.

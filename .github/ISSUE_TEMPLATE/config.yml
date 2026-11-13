@@ -1,0 +1,6 @@
+# Only the two forms above: every issue starts as a bug or a feature
+blank_issues_enabled: false
+contact_links:
+  - name: Open G-Chord
+    url: https://g-chord.vercel.app
+    about: Try the app before reporting, in case it is already fixed.
